@@ -59,7 +59,7 @@ module.exports = class CsvData {
    * 月種別
    * @param {Number} value
    * 0[第1四半期]
-   * 1[第2四半期]
+   * 1[第2四半期]
    * 2[第3四半期]
    * 4[期末]
    */
@@ -81,7 +81,7 @@ module.exports = class CsvData {
    * 形式
    * @param {Number} value
    * 1[入金]
-   * 2[出金]
+   * 2[出金]
    * 3[振替]
    * 4[単一]
    * 5[帳簿]
@@ -94,7 +94,7 @@ module.exports = class CsvData {
    * 作成方法
    * @param {Number} value
    * 0[手入力]
-   * 1[自動作成]
+   * 1[自動作成]
    * 2[残高合併]
    * 3[伝票合併]
    */
@@ -103,7 +103,7 @@ module.exports = class CsvData {
   }
 
   /**
-   * 付箋
+   * 付箋
    * @param {Number} value
    * 0[無]
    * 1[行付箋-赤]
@@ -115,7 +115,7 @@ module.exports = class CsvData {
    * B[伝票付箋-青]
    * C[伝票付箋-緑]
    * D[伝票付箋-黄]
-   * E[伝票付箋-桃]
+   * E[伝票付箋-桃]
    */
   set tag(value) {
     this.data.tag.value = value;
@@ -170,7 +170,7 @@ module.exports = class CsvData {
    * 借方部門名
    * @param {String} value
    * 財務応援R4で設定されている部門名を指定
-   * (借方部門から自動指定可能)
+   * (借方部門から自動指定可能)
    * (Max:30Length)
    */
   set drDepartmentName(value) {
@@ -179,7 +179,7 @@ module.exports = class CsvData {
 
   /**
    * 借方科目
-   * @param {Number} value
+   * @param {Number} value
    * 財務応援R4で設定されている番号を指定(0~999999)
    */
   set drNumber(value) {
@@ -190,7 +190,7 @@ module.exports = class CsvData {
    * 借方科目名
    * @param {String} value
    * 財務応援R4で設定されている科目名を指定
-   * (借方科目から自動指定可能)
+   * (借方科目から自動指定可能)
    * (Max:24Length)
    */
   set drSubject(value) {
@@ -210,7 +210,7 @@ module.exports = class CsvData {
    * 借方補助科目名
    * @param {String} value
    * 財務応援R4で設定されている科目名を指定
-   * (借方補助から自動指定可能)
+   * (借方補助から自動指定可能)
    * (Max:24Length)
    */
   set subDrSubject(value) {
@@ -281,7 +281,7 @@ module.exports = class CsvData {
   }
 
   /**
-   * 貸方部門
+   * 貸方部門
    * @param {Number} value
    * 財務応援R4で設定されている番号を指定(0~999999)
    */
@@ -293,7 +293,7 @@ module.exports = class CsvData {
    * 貸方部門名
    * @param {String} value
    * 財務応援R4で設定されている部門名を指定
-   * (貸方部門から自動指定可能)
+   * (貸方部門から自動指定可能)
    * (Max:30Length)
    */
   set crDepartmentName(value) {
@@ -313,7 +313,7 @@ module.exports = class CsvData {
    * 貸方科目名
    * @param {String} value
    * 財務応援R4で設定されている科目名を指定
-   * (貸方科目から自動指定可能)
+   * (貸方科目から自動指定可能)
    * (Max:24Length)
    */
   set crSubject(value) {
@@ -333,7 +333,7 @@ module.exports = class CsvData {
    * 貸方補助科目名
    * @param {String} value
    * 財務応援R4で設定されている科目名を指定
-   * (貸方補助から自動指定可能)
+   * (貸方補助から自動指定可能)
    * (Max:24Length)
    */
   set subCrSubject(value) {
@@ -404,7 +404,7 @@ module.exports = class CsvData {
   }
 
   /**
-   * 摘要
+   * 摘要
    * @param {String} value
    * 摘要に表記する内容(Max:96Length)
    */
@@ -458,7 +458,7 @@ module.exports = class CsvData {
   }
 
   /**
-   * 入力会社
+   * 入力会社
    * @param {String} value
    * Max:40Length
    */
