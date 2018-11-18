@@ -1,0 +1,11 @@
+{
+  // ESlint extension
+  "eslint.autoFixOnSave": true,
+  "eslint.run": "onType",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact"
+  ],
+  // JS hint
+  "jshint.enable": false
+}
