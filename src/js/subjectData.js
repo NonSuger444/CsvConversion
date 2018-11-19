@@ -8,38 +8,34 @@ module.exports = class SubjectData {
    * Constructor
    */
   constructor() {
-    this.data = {
-      name: null,
-      code: null,
-      sub: [
-        {name: null, code: null},
-        {name: null, code: null},
-      ],
-    };
+    this.name = null;
+    this.code = null;
   }
 
   /**
    * 科目名
-   * @param {String} value
+   * @param {String} name
    * Set 'SubjectName'
    */
-  set name(value) {
-    this.data.name.value = value;
+  set setName(name) {
+    console.log('name : ' + name);
+    this.name = name;
   }
 
   /**
    * 科目コード
-   * @param {Number} value
+   * @param {Number} code
    * Set 'SubjectCode'
    */
-  set code(value) {
-    this.data.code.value = value;
+  set setCode(code) {
+    console.log('code : ' + code);
+    this.code = code;
   }
 
   /**
-   * 科目データ
+   * 科目
    */
-  get outputData() {
-    return this.data;
+  get output() {
+    return {name: this.name, code: this.code};
   }
 };
