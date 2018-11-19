@@ -5,14 +5,26 @@
   <title>科目設定</title>
 </head>
 <body>
-  <form>
+  <form id="subjectForm">
     <table border="1">
-      <tr>
-        <th>科目名</th>
-        <th>科目コード</th>
-        <th>補助科目設定</th>
-      </tr>
+      <thead id="subjectListTitle">
+        <tr>
+          <th>ID</th>
+          <th>状態</th>
+          <th>科目名</th>
+          <th>科目コード</th>
+          <th>補助科目設定</th>
+          <th>削除</th>
+        </tr>
+      </thead>
+      <tbody id="subjectListItem">
+      </tbody>
     </table>
+    <p>
+      <button type="button" id="addSubject">科目追加</button>
+      <button type="button" id="deleteSubject">科目削除</button>
+    </p>
   </form>
+  <script type="text/javascript" src="setSubject.js"></script>
 </body>
 </html>
