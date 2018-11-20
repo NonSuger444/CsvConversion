@@ -3,10 +3,11 @@
 const DATABASE = require('./js/operationDb');
 const subjectDB = new DATABASE('./db/subject.db');
 subjectDB.load()
-    .then((msg) => {
-      subjectDB.sort({}, {code: 1});
+    .then(() => {
+      return subjectDB.sort({}, {code: 1});
     })
     .then((docs) => {
+      createTableBody(docs);
     })
     .catch((error) => {
       console.error(error);
@@ -14,15 +15,38 @@ subjectDB.load()
 
 // Table
 const T_BODY = document.getElementById('subjectListItem');
+/**
+ * Create Table Body
+ * @param {Object} docs Subject Data
+ */
+function createTableBody(docs) {
+  docs.forEach((doc) => {
+    for (const key in doc) {
+      if (!doc.hasOwnProperty(key)) continue;
+      switch (key) {
+        case '_id':
+          break;
+        case 'code':
+          break;
+        case 'name':
+          break;
+      }
+    }
+  });
+}
 
-document.getElementById('addSubject').addEventListener('click', () => {
+/**
+ * Create Table Row (Empty)
+ * @return {Element} Add <tr> Info
+ */
+function createTableEmptyRow() {
   const row = T_BODY.insertRow(-1);
   // Set 'ID' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createInput('text', 'subjectID', null, true));
   // Set 'State' Area
   row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectState', '新規', true));
+  row.lastElementChild.appendChild(createInput('text', 'subjectState', null, true));
   // Set 'SubjectName' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createInput('text', 'subjectName'));
@@ -35,6 +59,12 @@ document.getElementById('addSubject').addEventListener('click', () => {
   // Set 'DeleteButton' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createButton(null, 'button', 'delete', null, '削除'));
+  return row;
+}
+
+document.getElementById('addSubject').addEventListener('click', () => {
+  const row = createTableEmptyRow();
+  console.log(row);
 });
 
 const SUBJECT_DATA = require('./js/subjectData');
