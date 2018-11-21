@@ -41,30 +41,34 @@ function createTableBody(docs) {
  */
 function createTableEmptyRow() {
   const row = T_BODY.insertRow(-1);
+  const num = T_BODY.children.length - 1; // NUMBER
   // Set 'ID' Area
   row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectID', null, true));
+  row.lastElementChild.appendChild(createInput('text', 'subjectID', 'subjectID', null, true));
   // Set 'State' Area
   row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectState', null, true));
+  row.lastElementChild.appendChild(createInput('text', 'subjectState', 'subjectState', null, true));
   // Set 'SubjectName' Area
   row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectName'));
+  row.lastElementChild.appendChild(createInput('text', 'subjectName', 'subjectName'));
   // Set 'SubjectCode' Area
   row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('number', 'subjectCode'));
+  row.lastElementChild.appendChild(createInput('number', 'subjectCode', 'subjectCode'));
   // Set 'SetSubSubjectButton' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createButton(null, 'button', 'setSubSubject', null, '補助科目'));
   // Set 'DeleteButton' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createButton(null, 'button', 'delete', null, '削除'));
+
+  console.log(T_BODY.children[num].getAttributeNames());
+  console.log(T_BODY.children[num].getElementsByClassName('subjectNo').item(0));
+
   return row;
 }
 
 document.getElementById('addSubject').addEventListener('click', () => {
   const row = createTableEmptyRow();
-  console.log(row);
 });
 
 const SUBJECT_DATA = require('./js/subjectData');
@@ -93,14 +97,16 @@ document.getElementById('signUp').addEventListener('click', () => {
  * Create Input Element
  * @param {String} type Input Type
  * @param {String} name Input Name
+ * @param {String} className Input Class Name
  * @param {String} value Input Value
  * @param {Boolean} readonly Input Readonly Flag
  * @return {Any} Input Element
  */
-function createInput(type='text', name=null, value=null, readonly=false) {
+function createInput(type='text', name=null, className=null, value=null, readonly=false) {
   const input = document.createElement('input');
   input.type = type;
   if (name) input.name = name;
+  if (className) input.className = className;
   if (value) input.value = value;
   if (readonly) input.readOnly = readonly;
   return input;
