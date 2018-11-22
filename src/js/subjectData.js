@@ -18,8 +18,15 @@ module.exports = class SubjectData {
    * Set 'SubjectName'
    */
   set setName(name) {
-    console.log('name : ' + name);
     this.name = name;
+  }
+
+  /**
+   * 科目名
+   * Get 'SubjectName'
+   */
+  get getName() {
+    return this.name;
   }
 
   /**
@@ -28,14 +35,21 @@ module.exports = class SubjectData {
    * Set 'SubjectCode'
    */
   set setCode(code) {
-    console.log('code : ' + code);
     this.code = code;
+  }
+
+  /**
+   * 科目コード
+   * Get 'SubjectCode'
+   */
+  get getCode() {
+    return this.code;
   }
 
   /**
    * 科目
    */
-  get output() {
-    return {name: this.name, code: this.code};
+  get dbData() {
+    return {_id: this.code, name: this.name};
   }
 };
