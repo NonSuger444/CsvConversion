@@ -17,7 +17,7 @@ module.exports = class SubjectData {
    * @param {String} name
    * Set 'SubjectName'
    */
-  set setName(name) {
+  set subjectName(name) {
     this.name = name;
   }
 
@@ -25,7 +25,7 @@ module.exports = class SubjectData {
    * 科目名
    * Get 'SubjectName'
    */
-  get getName() {
+  get subjectName() {
     return this.name;
   }
 
@@ -34,7 +34,7 @@ module.exports = class SubjectData {
    * @param {Number} code
    * Set 'SubjectCode'
    */
-  set setCode(code) {
+  set subjectCode(code) {
     this.code = code;
   }
 
@@ -42,14 +42,15 @@ module.exports = class SubjectData {
    * 科目コード
    * Get 'SubjectCode'
    */
-  get getCode() {
+  get subjectCode() {
     return this.code;
   }
 
   /**
-   * 科目
+   * Database 科目情報
+   * @return {Object} Database Info
    */
-  get dbData() {
+  subjectDbData() {
     return {_id: this.code, name: this.name};
   }
 };
