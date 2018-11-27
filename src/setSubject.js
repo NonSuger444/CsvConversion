@@ -16,10 +16,10 @@ subjectDB.load()
 // Table
 const T_BODY = document.getElementById('subjectListItem');
 const T_STATE = {
-  new: {text: '新規', button: '削除', color: 'mistyrose', readOnly: false, disabled: false},
-  change: {text: '変更', button: '削除', color: 'lightskyblue', readOnly: false, disabled: false},
-  delete: {text: '削除', button: '取消', color: 'lightgray', readOnly: true, disabled: true},
-  nothing: {text: '', button: '削除', color: null, readOnly: false, disabled: false},
+  new: {text: '新規', button: '削除', color: 'mistyrose', readOnly: false, disabled: false, required: true},
+  change: {text: '変更', button: '削除', color: 'lightskyblue', readOnly: false, disabled: false, required: true},
+  delete: {text: '削除', button: '取消', color: 'lightgray', readOnly: true, disabled: true, required: false},
+  nothing: {text: '', button: '削除', color: null, readOnly: false, disabled: false, required: true},
 };
 
 /**
@@ -29,12 +29,20 @@ const T_STATE = {
 function createTableBody(docs) {
   docs.forEach((doc) => {
     const row = createTableEmptyRow();
+    setState(row, T_STATE.nothing);
+    // Input Info
+    row.getElementsByClassName('subjectID').item(0).value = doc['_id'];
     row.getElementsByClassName('subjectState').item(0).value = T_STATE.nothing.text;
-    row.getElementsByClassName('subjectCode').item(0).value = doc['_id'];
+    row.getElementsByClassName('subjectCode').item(0).value = doc['code'];
     row.getElementsByClassName('subjectName').item(0).value = doc['name'];
     row.getElementsByClassName('changeState').item(0).value = T_STATE.nothing.button;
-    row.getElementsByClassName('subjectCode').item(0).addEventListener('DOMFocusOut', () => {
-      console.log(doc['_id']);
+    // Add Event
+    row.getElementsByClassName('subjectCode').item(0).addEventListener('DOMFocusOut', function() {
+      let check = 0;
+      document.getElementsByName('subjectCode').forEach((value, index) => {
+        if (this.value === value.value) ++check;
+      });
+      if (check >= 2) this.focus();
     });
     row.getElementsByClassName('changeState').item(0).addEventListener('click', (event) => {
       changeRowState(row);
@@ -51,7 +59,6 @@ function changeRowState(row) {
   const afterState = row.getElementsByClassName('changeState').item(0).value;
   row.getElementsByClassName('changeState').item(0).value = beforeState;
   row.getElementsByClassName('subjectState').item(0).value = afterState;
-  console.log(afterState);
   switch (afterState) {
     case T_STATE.nothing.text:
       setState(row, T_STATE.nothing);
@@ -75,12 +82,21 @@ function changeRowState(row) {
  */
 function setState(row, state) {
   row.style.backgroundColor = state.color;
+  // ID
+  row.getElementsByClassName('subjectID').item(0).style.backgroundColor = state.color;
+  // State
   row.getElementsByClassName('subjectState').item(0).style.backgroundColor = state.color;
+  // Code
   row.getElementsByClassName('subjectCode').item(0).readOnly = state.readOnly;
+  row.getElementsByClassName('subjectCode').item(0).required = state.required;
   row.getElementsByClassName('subjectCode').item(0).style.backgroundColor = state.color;
+  // Name
   row.getElementsByClassName('subjectName').item(0).readOnly = state.readOnly;
+  row.getElementsByClassName('subjectName').item(0).required = state.required;
   row.getElementsByClassName('subjectName').item(0).style.backgroundColor = state.color;
+  // Sub Subject Button
   row.getElementsByClassName('setSubSubject').item(0).disabled = state.disabled;
+  // Delete / Chancel Button
   row.getElementsByClassName('changeState').item(0).innerHTML = state.button;
 }
 
@@ -90,6 +106,9 @@ function setState(row, state) {
  */
 function createTableEmptyRow() {
   const row = T_BODY.insertRow(-1);
+  // Set 'ID' Area
+  row.insertCell(-1);
+  row.lastElementChild.appendChild(createInput('text', 'subjectID', 'subjectID', null, true));
   // Set 'State' Area
   row.insertCell(-1);
   row.lastElementChild.appendChild(createInput('text', 'subjectState', 'subjectState', null, true));
@@ -111,7 +130,7 @@ function createTableEmptyRow() {
 document.getElementById('addSubject').addEventListener('click', () => {
   const row = createTableEmptyRow();
   row.getElementsByClassName('subjectState').item(0).value = T_STATE.new.text;
-  row.getElementsByClassName('changeState').item(0).value = T_STATE.delete.text;
+  row.getElementsByClassName('changeState').item(0).value = T_STATE.new.button;
   setState(row, T_STATE.new);
   row.getElementsByClassName('changeState').item(0).addEventListener('click', (event) => {
     changeRowState(row);
@@ -121,25 +140,29 @@ document.getElementById('addSubject').addEventListener('click', () => {
 const SUBJECT_DATA = require('./js/subjectData');
 const FORM = document.forms.subjectForm;
 document.getElementById('signUp').addEventListener('click', () => {
-  for (let row = 1; row < T_BODY.children.length; row++) {
-    const data = new SUBJECT_DATA();
-    data.subjectCode = FORM.subjectCode[row].value;
-    data.subjectName = FORM.subjectName[row].value;
-    subjectDB.insert(data.subjectDbData())
-        .then((docs) => console.log(docs))
-        .catch((error) => console.error(error));
-    // if (data.getCode) {
-    //   // DB Update
-    //   subjectDB.update({_id: data.getCode}, {$set: data})
-    //       .then((numOfDocs) => console.log(numOfDocs))
-    //       .catch((error) => console.error(error));
-    // } else {
-    //   // DB Insert
-    //   subjectDB.insert(data)
-    //       .then((docs) => console.log(docs))
-    //       .catch((error) => console.error(error));
-    // }
-  }
+  // Check Validate
+  if (!FORM.checkValidity()) return;
+
+  // for (let row = 1; row < T_BODY.children.length; row++) {
+  //   const data = new SUBJECT_DATA();
+  //   data.subjectCode = FORM.subjectCode[row].value;
+  //   data.subjectName = FORM.subjectName[row].value;
+  //   subjectDB.insert(data.subjectDbData())
+  //       .then((docs) => console.log(docs))
+  //       .catch((error) => console.error(error));
+  // }
+
+  // if (data.getCode) {
+  //   // DB Update
+  //   subjectDB.update({_id: data.getCode}, {$set: data})
+  //       .then((numOfDocs) => console.log(numOfDocs))
+  //       .catch((error) => console.error(error));
+  // } else {
+  //   // DB Insert
+  //   subjectDB.insert(data)
+  //       .then((docs) => console.log(docs))
+  //       .catch((error) => console.error(error));
+  // }
 });
 
 /**

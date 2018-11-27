@@ -51,6 +51,6 @@ module.exports = class SubjectData {
    * @return {Object} Database Info
    */
   subjectDbData() {
-    return {_id: this.code, name: this.name};
+    return {code: this.code, name: this.name};
   }
 };
