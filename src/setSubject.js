@@ -38,11 +38,13 @@ function createTableBody(docs) {
     row.getElementsByClassName('changeState').item(0).value = T_STATE.nothing.button;
     // Add Event
     row.getElementsByClassName('subjectCode').item(0).addEventListener('DOMFocusOut', function() {
+      // Check Double
       let check = 0;
       document.getElementsByName('subjectCode').forEach((value, index) => {
         if (this.value === value.value) ++check;
       });
       if (check >= 2) this.focus();
+      // Change State
     });
     row.getElementsByClassName('changeState').item(0).addEventListener('click', (event) => {
       changeRowState(row);
@@ -143,14 +145,17 @@ document.getElementById('signUp').addEventListener('click', () => {
   // Check Validate
   if (!FORM.checkValidity()) return;
 
-  // for (let row = 1; row < T_BODY.children.length; row++) {
-  //   const data = new SUBJECT_DATA();
-  //   data.subjectCode = FORM.subjectCode[row].value;
-  //   data.subjectName = FORM.subjectName[row].value;
-  //   subjectDB.insert(data.subjectDbData())
-  //       .then((docs) => console.log(docs))
-  //       .catch((error) => console.error(error));
-  // }
+  for (let row = 1; row < T_BODY.children.length; row++) {
+    console.log(FORM.subjectState[row].value);
+    // const data = new SUBJECT_DATA();
+    // data.subjectCode = FORM.subjectCode[row].value;
+    // data.subjectName = FORM.subjectName[row].value;
+    // subjectDB.insert(data.subjectDbData())
+    //     .then((docs) => console.log(docs))
+    //     .catch((error) => console.error(error));
+  }
+
+  alert('STOP');
 
   // if (data.getCode) {
   //   // DB Update
