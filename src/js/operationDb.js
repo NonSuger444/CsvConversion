@@ -1,4 +1,3 @@
-
 'use strict';
 
 /**
@@ -108,6 +107,19 @@ module.exports = class OperationDB {
     return new Promise((resolve, reject) => {
       this.db.update(query, update, options, (error, numOfDocs) => {
         error !== null ? reject(error) : resolve(numOfDocs);
+      });
+    });
+  }
+
+  /**
+   * Ensure Index
+   * @param {Oject} options Ensure Index Option
+   * @return {String} Result
+   */
+  ensureIndex(options = {}) {
+    return new Promise((resolve, reject) => {
+      this.db.ensureIndex(options, (error) => {
+        error !== null ? reject(error) : resolve('ensure index completed!!');
       });
     });
   }
