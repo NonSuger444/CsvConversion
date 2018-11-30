@@ -57,13 +57,8 @@ function setTableRowInfo(doc, tState) {
   change.value = tState.button;
   // Add Event
   code.addEventListener('DOMFocusOut', () => {
-    if (checkDuplication(code.value, 'subjectCode')) {
-      changeErrorRowState(row, 'subjectCode', state);
-      code.focus();
-      return;
-    }
-    // Check Error Row
-    if (state.value === T_STATE.error.text) changeErrorRowState(row, 'subjectCode', state);
+    // Check Duplication
+    if (duplicationError(row, state, code)) return;
     // Check New Row
     if (state.value === T_STATE.new.text) return;
     // Change State
@@ -81,7 +76,7 @@ function setTableRowInfo(doc, tState) {
   });
   change.addEventListener('click', (event) => {
     // Chenge Delete / Cancel State
-    changeDeleteRowState(row);
+    changeDeleteRowState(row, state, change);
   });
 }
 
@@ -104,11 +99,13 @@ function checkDuplication(checkValue, checkColumnName) {
 /**
  * Change Delete State
  * @param {Object} row Row Info
+ * @param {Object} state Subject State
+ * @param {Object} change Change State Button
  */
-function changeDeleteRowState(row) {
-  const beforeState = row.getElementsByClassName('subjectState').item(0).value;
-  const afterState = row.getElementsByClassName('changeState').item(0).value;
-  row.getElementsByClassName('changeState').item(0).value = beforeState;
+function changeDeleteRowState(row, state, change) {
+  const beforeState = state.value;
+  const afterState = change.value;
+  change.value = beforeState;
   switch (afterState) {
     case T_STATE.nothing.text:
       setState(row, T_STATE.nothing);
@@ -126,19 +123,38 @@ function changeDeleteRowState(row) {
 }
 
 /**
- *
+ * Duplication Error
+ * @param {Object} row Row Info
+ * @param {Object} state Subject State
+ * @param {Object} code Subject Code
+ * @return {Boolean} Result
  */
-function changeErrorRowState(row, name, state) {
-  if (state.value !== T_STATE.error.text) {
-    const column = row.getElementsByClassName(name).item(0);
-    const p = document.createElement('p');
-    p.id = 'codeDouplicationError';
-    p.innerHTML = 'test';
-    column.parentNode.insertBefore(p, column.nextSibling);
-    setState(row, T_STATE.error);
+function duplicationError(row, state, code) {
+  // Check Douplication Error
+  if (checkDuplication(code.value, 'subjectCode')) {
+    if (state.value !== T_STATE.error.text) {
+      const p = document.createElement('p');
+      p.id = 'codeDouplicationError';
+      p.innerHTML = '※ 入力したコードは既に使用されています。';
+      code.parentNode.insertBefore(p, code.nextSibling);
+      setState(row, T_STATE.error);
+    }
+    code.focus();
+    return true;
   } else {
-    const deleteElement = document.getElementById('codeDouplicationError');
-    deleteElement.parentNode.removeChild(deleteElement);
+    if (state.value === T_STATE.error.text) {
+      const deleteElement = document.getElementById('codeDouplicationError');
+      deleteElement.parentNode.removeChild(deleteElement);
+      switch (state.placeholder) {
+        case T_STATE.nothing.text:
+          setState(row, T_STATE.nothing);
+          break;
+        case T_STATE.new.text:
+          setState(row, T_STATE.new);
+          break;
+      }
+    }
+    return false;
   }
 }
 
