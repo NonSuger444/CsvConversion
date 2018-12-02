@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>補助科目設定</title>
+</head>
+<body style="-webkit-app-region: drag">
+  <h1>補助科目設定</h1>
+  <p>
+    <label for="subjectCode">主科目コード</label>
+    <input type="text" id="subjectCode" readonly>
+  </p>
+  <p>
+    <label for="subjectName">主科目名</label>
+    <input type="text" id="subjectName" readonly>
+  </p>
+  <form id="settingsForm">
+    <table border="1">
+      <thead id="subjectListTitle">
+        <tr>
+          <th>ID</th>
+          <th>状態</th>
+          <th>補助科目コード</th>
+          <th>補助科目名</th>
+          <th>削除</th>
+        </tr>
+      </thead>
+      <tbody id="subjectListItem">
+        <tr>
+          <td><input type="text" name="id" class="id" readonly></td>
+          <td><input type="text" name="state" class="state" readonly></td>
+          <td><input type="text" name="code" class="code" readonly></td>
+          <td><input type="text" name="name" class="name" readonly></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <button type="button" id="add">追加</button>
+      <button type="submit" id="signUp">登録</button>
+    </p>
+  </form>
+  <p>
+    <button type="button" id="close">閉じる</button>
+  </p>
+  <script type="text/javascript" src="./setSubSubject.js"></script>
+</body>
+</html>

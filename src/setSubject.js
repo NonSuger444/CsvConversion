@@ -1,4 +1,8 @@
 'use strict';
+
+// Electron
+const IPC_RENDERER = require('electron').ipcRenderer;
+
 // Database
 const DATABASE = require('./js/operationDb');
 const subjectDB = new DATABASE('./db/subject.db');
@@ -48,6 +52,7 @@ function setTableRowInfo(doc, tState) {
   const code = row.getElementsByClassName('subjectCode').item(0);
   const name = row.getElementsByClassName('subjectName').item(0);
   const change = row.getElementsByClassName('changeState').item(0);
+  const set = row.getElementsByClassName('setSubSubject').item(0);
   setState(row, tState);
   id.value = doc['_id'];
   state.value = tState.text;
@@ -73,6 +78,9 @@ function setTableRowInfo(doc, tState) {
     (code.value !== doc['code'] || name.value !== doc['name']) ?
       setState(row, T_STATE.change) :
       setState(row, tState);
+  });
+  set.addEventListener('click', (event) => {
+    IPC_RENDERER.send('open_sub_subject', {code: code.value, name: name.value});
   });
   change.addEventListener('click', (event) => {
     // Chenge Delete / Cancel State
