@@ -1,5 +1,11 @@
 'use strict';
 
+const COLUMN = {
+  id: '_id',
+  code: 'code',
+  name: 'name',
+};
+
 /**
  * Subject Data
  */
@@ -17,16 +23,16 @@ module.exports = class SubjectData {
    * @param {String} name
    * Set 'SubjectName'
    */
-  set subjectName(name) {
-    this.name = name;
+  set name(name) {
+    this._name = name;
   }
 
   /**
    * 科目名
    * Get 'SubjectName'
    */
-  get subjectName() {
-    return this.name;
+  get name() {
+    return this._name;
   }
 
   /**
@@ -34,23 +40,44 @@ module.exports = class SubjectData {
    * @param {Number} code
    * Set 'SubjectCode'
    */
-  set subjectCode(code) {
-    this.code = code;
+  set code(code) {
+    this._code = code;
   }
 
   /**
    * 科目コード
    * Get 'SubjectCode'
    */
-  get subjectCode() {
-    return this.code;
+  get code() {
+    return this._code;
+  }
+
+  /**
+   * Subject DB - Column Infomation
+   * @return {Object} Column Infomation
+   */
+  static columnInfo() {
+    return COLUMN;
+  }
+
+  /**
+   * Database 科目情報 - EMPTY
+   * @return {Object} Database Info - EMPTY
+   */
+  static emptyData() {
+    return {
+      _id: null,
+      code: null,
+      name: null};
   }
 
   /**
    * Database 科目情報
    * @return {Object} Database Info
    */
-  subjectDbData() {
-    return {code: this.code, name: this.name};
+  dbData() {
+    return {
+      code: this._code,
+      name: this._name};
   }
 };

@@ -52,6 +52,10 @@ ipcMain.on('open_sub_subject', (event, subjectInfo) => {
   });
 });
 
+ipcMain.on('close_subject', (event) => {
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
+});
+
 ipcMain.on('close_sub_subject', (event) => {
   setSubSubjectWindow.close();
 });

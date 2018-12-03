@@ -5,288 +5,66 @@ const IPC_RENDERER = require('electron').ipcRenderer;
 
 // Database
 const DATABASE = require('./js/operationDb');
-const subjectDB = new DATABASE('./db/subject.db');
-subjectDB.ensureIndex({fieldName: 'code', unique: true})
+const SUBJECT_DB = new DATABASE('./db/subject.db');
+const SUBJECT_DATA = require('./js/subjectData');
+
+// Table
+const TABLE = require('./js/subjectTable');
+const SUBJECT_TABLE = new TABLE(
+    document.getElementById('subjectListItem'),
+    SUBJECT_DATA.columnInfo(),
+    true);
+
+// Initialize
+SUBJECT_DB.ensureIndex({fieldName: 'code', unique: true})
     .then(() => {
-      return subjectDB.load();
+      return SUBJECT_DB.load();
     })
     .then(() => {
-      return subjectDB.sort({}, {code: 1});
+      return SUBJECT_DB.sort({}, {code: 1});
     })
     .then((docs) => {
-      createTableBody(docs);
+      docs.forEach((doc) => {
+        SUBJECT_TABLE.setRow(doc);
+      });
     })
     .catch((error) => {
       console.error(error);
     });
 
-// Table
-const T_BODY = document.getElementById('subjectListItem');
-const T_STATE = {
-  new: {text: '新規', button: '削除', color: 'mistyrose', readOnly: false, disabled: false, required: true},
-  change: {text: '変更', button: '削除', color: 'lightskyblue', readOnly: false, disabled: false, required: true},
-  delete: {text: '削除', button: '取消', color: 'lightgray', readOnly: true, disabled: true, required: false},
-  error: {text: '異常', button: '削除', color: 'lightyellow', readOnly: false, disabled: false, required: true},
-  nothing: {text: '', button: '削除', color: null, readOnly: false, disabled: false, required: true},
+document.getElementById('add').addEventListener('click', () => {
+  if (SUBJECT_TABLE.checkError()) return;
+  SUBJECT_TABLE.newRow(SUBJECT_DATA.emptyData());
+});
+
+document.getElementById('settingsForm').onsubmit = () => {
+  // Check Validate
+  if (SUBJECT_TABLE.checkError()) return false;
+  if (!document.forms.settingsForm.checkValidity()) return false;
+  // Sign Up
+  for (let row = 1; row < SUBJECT_TABLE.countChildlen(); row++) {
+    const DATA = new SUBJECT_DATA();
+    DATA.code = SUBJECT_TABLE.getCode(row);
+    DATA.name = SUBJECT_TABLE.getName(row);
+    switch (SUBJECT_TABLE.getState(row)) {
+      case TABLE.getNewStateText():
+        SUBJECT_DB.insert(DATA.dbData())
+            .catch((error) => console.error(error));
+        break;
+      case TABLE.getChangeStateText():
+        SUBJECT_DB.update({_id: SUBJECT_TABLE.getID(row)},
+            {$set: DATA.dbData()})
+            .catch((error) => console.error(error));
+        break;
+      case TABLE.getDeleteStateText():
+        SUBJECT_DB.destroy({_id: SUBJECT_TABLE.getID(row)})
+            .catch((error) => console.error(error));
+        break;
+    }
+  }
+  return true;
 };
 
-/**
- * Create Table Body
- * @param {Object} docs Subject Data
- */
-function createTableBody(docs) {
-  docs.forEach((doc) => {
-    setTableRowInfo(doc, T_STATE.nothing);
-  });
-}
-
-/**
- * Set Table Row Info
- * @param {Object} doc Document
- * @param {Object} tState State
- */
-function setTableRowInfo(doc, tState) {
-  const row = createTableEmptyRow();
-  const id = row.getElementsByClassName('subjectID').item(0);
-  const state = row.getElementsByClassName('subjectState').item(0);
-  const code = row.getElementsByClassName('subjectCode').item(0);
-  const name = row.getElementsByClassName('subjectName').item(0);
-  const change = row.getElementsByClassName('changeState').item(0);
-  const set = row.getElementsByClassName('setSubSubject').item(0);
-  setState(row, tState);
-  id.value = doc['_id'];
-  state.value = tState.text;
-  state.placeholder = tState.text;
-  code.value = doc['code'];
-  name.value = doc['name'];
-  change.value = tState.button;
-  // Add Event
-  code.addEventListener('DOMFocusOut', () => {
-    // Check Duplication
-    if (duplicationError(row, state, code)) return;
-    // Check New Row
-    if (state.value === T_STATE.new.text) return;
-    // Change State
-    (code.value !== doc['code'] || name.value !== doc['name']) ?
-      setState(row, T_STATE.change) :
-      setState(row, tState);
-  });
-  name.addEventListener('DOMFocusOut', () => {
-    // Check New Row
-    if (state.value === T_STATE.new.text) return;
-    // Change State
-    (code.value !== doc['code'] || name.value !== doc['name']) ?
-      setState(row, T_STATE.change) :
-      setState(row, tState);
-  });
-  set.addEventListener('click', (event) => {
-    IPC_RENDERER.send('open_sub_subject', {code: code.value, name: name.value});
-  });
-  change.addEventListener('click', (event) => {
-    // Chenge Delete / Cancel State
-    changeDeleteRowState(row, state, change);
-  });
-}
-
-/**
- * Duplication Check
- * @param {any} checkValue Target Value
- * @param {String} checkColumnName Check Column
- * @return {Boolean} Duplication Flag
- */
-function checkDuplication(checkValue, checkColumnName) {
-  const columnInfo = document.getElementsByName(checkColumnName);
-  for (let i = 0, count = 0; i < columnInfo.length; i++) {
-    if (!columnInfo[i].value) continue;
-    if (checkValue === columnInfo[i].value) ++count;
-    if (count === 2) return true;
-  }
-  return false;
-}
-
-/**
- * Change Delete State
- * @param {Object} row Row Info
- * @param {Object} state Subject State
- * @param {Object} change Change State Button
- */
-function changeDeleteRowState(row, state, change) {
-  const beforeState = state.value;
-  const afterState = change.value;
-  change.value = beforeState;
-  switch (afterState) {
-    case T_STATE.nothing.text:
-      setState(row, T_STATE.nothing);
-      break;
-    case T_STATE.new.text:
-      setState(row, T_STATE.new);
-      break;
-    case T_STATE.change.text:
-      setState(row, T_STATE.change);
-      break;
-    case T_STATE.delete.text:
-      setState(row, T_STATE.delete);
-      break;
-  }
-}
-
-/**
- * Duplication Error
- * @param {Object} row Row Info
- * @param {Object} state Subject State
- * @param {Object} code Subject Code
- * @return {Boolean} Result
- */
-function duplicationError(row, state, code) {
-  // Check Douplication Error
-  if (checkDuplication(code.value, 'subjectCode')) {
-    if (state.value !== T_STATE.error.text) {
-      const p = document.createElement('p');
-      p.id = 'codeDouplicationError';
-      p.innerHTML = '※ 入力したコードは既に使用されています。';
-      code.parentNode.insertBefore(p, code.nextSibling);
-      setState(row, T_STATE.error);
-    }
-    code.focus();
-    return true;
-  } else {
-    if (state.value === T_STATE.error.text) {
-      const deleteElement = document.getElementById('codeDouplicationError');
-      deleteElement.parentNode.removeChild(deleteElement);
-      switch (state.placeholder) {
-        case T_STATE.nothing.text:
-          setState(row, T_STATE.nothing);
-          break;
-        case T_STATE.new.text:
-          setState(row, T_STATE.new);
-          break;
-      }
-    }
-    return false;
-  }
-}
-
-/**
- * Set State
- * @param {Object} row Row Info
- * @param {Object} state State Info
- */
-function setState(row, state) {
-  row.style.backgroundColor = state.color;
-  // ID
-  row.getElementsByClassName('subjectID').item(0).style.backgroundColor = state.color;
-  // State
-  row.getElementsByClassName('subjectState').item(0).value = state.text;
-  row.getElementsByClassName('subjectState').item(0).style.backgroundColor = state.color;
-  // Code
-  row.getElementsByClassName('subjectCode').item(0).readOnly = state.readOnly;
-  row.getElementsByClassName('subjectCode').item(0).required = state.required;
-  row.getElementsByClassName('subjectCode').item(0).style.backgroundColor = state.color;
-  // Name
-  row.getElementsByClassName('subjectName').item(0).readOnly = state.readOnly;
-  row.getElementsByClassName('subjectName').item(0).required = state.required;
-  row.getElementsByClassName('subjectName').item(0).style.backgroundColor = state.color;
-  // Sub Subject Button
-  row.getElementsByClassName('setSubSubject').item(0).disabled = state.disabled;
-  // Delete / Chancel Button
-  row.getElementsByClassName('changeState').item(0).innerHTML = state.button;
-}
-
-/**
- * Create Table Row (Empty)
- * @return {Element} Add <tr> Info
- */
-function createTableEmptyRow() {
-  const row = T_BODY.insertRow(-1);
-  // Set 'ID' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectID', 'subjectID', null, true));
-  // Set 'State' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectState', 'subjectState', null, true));
-  // Set 'SubjectCode' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('number', 'subjectCode', 'subjectCode'));
-  // Set 'SubjectName' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createInput('text', 'subjectName', 'subjectName'));
-  // Set 'SetSubSubjectButton' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createButton(null, 'button', 'setSubSubject', 'setSubSubject', null, '補助科目'));
-  // Set 'ChangeStateButton' Area
-  row.insertCell(-1);
-  row.lastElementChild.appendChild(createButton(null, 'button', 'changeState', 'changeState', null, T_STATE.nothing.button));
-  return row;
-}
-
-document.getElementById('addSubject').addEventListener('click', () => {
-  const doc = {_id: null, code: null, name: null};
-  setTableRowInfo(doc, T_STATE.new);
+document.getElementById('close').addEventListener('click', (event) => {
+  IPC_RENDERER.send('close_subject');
 });
-
-const SUBJECT_DATA = require('./js/subjectData');
-const FORM = document.forms.subjectForm;
-document.getElementById('signUp').addEventListener('click', () => {
-  // Check Validate
-  if (!FORM.checkValidity()) return;
-  // Sign Up
-  for (let row = 1; row < T_BODY.children.length; row++) {
-    const data = new SUBJECT_DATA();
-    data.subjectCode = FORM.subjectCode[row].value;
-    data.subjectName = FORM.subjectName[row].value;
-    switch (FORM.subjectState[row].value) {
-      case T_STATE.new.text:
-        subjectDB.insert(data.subjectDbData())
-            .catch((error) => console.error(error));
-        break;
-      case T_STATE.change.text:
-        subjectDB.update({_id: FORM.subjectID[row].value}, {$set: data.subjectDbData()})
-            .catch((error) => console.error(error));
-        break;
-      case T_STATE.delete.text:
-        subjectDB.destroy({_id: FORM.subjectID[row].value})
-            .catch((error) => console.error(error));
-    }
-  }
-  alert('STOP');
-});
-
-/**
- * Create Input Element
- * @param {String} type Input Type
- * @param {String} name Input Name
- * @param {String} className Input Class Name
- * @param {String} value Input Value
- * @param {Boolean} readonly Input Readonly Flag
- * @return {Any} Input Element
- */
-function createInput(type='text', name=null, className=null, value=null, readonly=false) {
-  const input = document.createElement('input');
-  input.type = type;
-  if (name) input.name = name;
-  if (className) input.className = className;
-  if (value) input.value = value;
-  if (readonly) input.readOnly = readonly;
-  return input;
-}
-
-/**
- * Create Button Element
- * @param {String} id Button ID
- * @param {String} type Button Type
- * @param {String} name Button Name
- * @param {String} className Button Class Name
- * @param {String} value Button Value
- * @param {String} text Button Text
- * @return {Any} Button Element
- */
-function createButton(id=null, type='button', name=null, className=null, value=null, text=null) {
-  const button = document.createElement('button');
-  if (id) button.id = id;
-  button.type = type;
-  if (name) button.name = name;
-  if (className) button.className = className;
-  if (value) button.value = value;
-  if (text) button.innerHTML = text;
-  return button;
-}

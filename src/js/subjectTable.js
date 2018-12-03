@@ -1,5 +1,8 @@
 'use strict';
 
+// Electron
+const IPC_RENDERER = require('electron').ipcRenderer;
+
 const STATE = {
   new: {
     text: '新規',
@@ -49,11 +52,16 @@ const NAME = {
   code: 'code',
   name: 'name',
   delete: 'delete',
+  set: 'set',
 };
 
 const DUPLICATION_CODE_ERROR = {
   className: 'codeDouplicationError',
   text: '※ 入力したコードは既に使用されています。',
+};
+
+const ERROR_MESSAGE = {
+  checkError: '状態が「異常」であるものがあります。\n「異常」を解決した後に実施してください。',
 };
 
 /**
@@ -64,10 +72,15 @@ module.exports = class SubjectTable {
    * Constructor
    * @param {Element} tbody Table Body Element
    * @param {Object} dbColumn DB Colum Info
+   * @param {Boolean} main Subject Flag
    */
-  constructor(tbody, dbColumn) {
+  constructor(
+      tbody,
+      dbColumn,
+      main) {
     this.tbody = tbody;
     this.dbColumn = dbColumn;
+    this.main = main;
   }
 
   /**
@@ -116,8 +129,18 @@ module.exports = class SubjectTable {
         this.setState(row, STATE.change) :
         this.setState(row, tState);
     });
+    if (this.main) {
+      row.getElementsByClassName(NAME.set).item(0)
+          .addEventListener('click', (event) => {
+            if (SUBJECT_TABLE.checkError()) return;
+            IPC_RENDERER.send(
+                'open_sub_subject',
+                {code: code.value, name: name.value});
+          });
+    }
     del.addEventListener('click', (event) => {
       // Chenge Delete / Cancel State
+      if (SUBJECT_TABLE.checkError()) return;
       this.changeDeleteRowState(row, state, del);
     });
   }
@@ -178,6 +201,11 @@ module.exports = class SubjectTable {
         .item(0).required = state.required;
     row.getElementsByClassName(NAME.name)
         .item(0).style.backgroundColor = state.color;
+    // Sub Subject Button
+    if (this.main) {
+      row.getElementsByClassName(NAME.set)
+          .item(0).disabled = state.disabled;
+    }
     // Delete / Chancel Button
     row.getElementsByClassName(NAME.delete)
         .item(0).innerHTML = state.button;
@@ -205,6 +233,18 @@ module.exports = class SubjectTable {
     row.insertCell(-1);
     row.lastElementChild.appendChild(
         this.createInput('text', NAME.name, NAME.name));
+    // Set 'SetSubSubjectButton' Area
+    if (this.main) {
+      row.insertCell(-1);
+      row.lastElementChild.appendChild(
+          this.createButton(
+              null,
+              'button',
+              NAME.set,
+              NAME.set,
+              null,
+              '補助科目'));
+    }
     // Set 'ChangeStateButton' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
@@ -356,6 +396,20 @@ module.exports = class SubjectTable {
       if (!columnInfo[i].value) continue;
       if (checkValue === columnInfo[i].value) ++count;
       if (count === 2) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Check Error
+   * @return {Boolean} Error Flag
+   */
+  checkError() {
+    for (let row = 0; row < this.countChildlen(); row++) {
+      if (this.getState(row) === STATE.error.text) {
+        alert(ERROR_MESSAGE.checkError);
+        return true;
+      }
     }
     return false;
   }

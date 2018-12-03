@@ -20,7 +20,8 @@ const SUB_SUBJECT_DATA = require('./js/subSubjectData');
 const TABLE = require('./js/subjectTable');
 const SUBJECT_TABLE = new TABLE(
     document.getElementById('subjectListItem'),
-    SUB_SUBJECT_DATA.columnInfo());
+    SUB_SUBJECT_DATA.columnInfo(),
+    false);
 
 // Initialize
 SUB_SUBJECT_DB.ensureIndex({fieldName: 'uniqueCode', unique: true})
@@ -40,12 +41,14 @@ SUB_SUBJECT_DB.ensureIndex({fieldName: 'uniqueCode', unique: true})
     });
 
 document.getElementById('add').addEventListener('click', () => {
+  if (SUBJECT_TABLE.checkError()) return;
   SUBJECT_TABLE.newRow(SUB_SUBJECT_DATA.emptyData());
 });
 
-document.getElementById('signUp').addEventListener('click', () => {
+document.getElementById('settingsForm').onsubmit = () => {
   // Check Validate
-  if (!document.forms.settingsForm.checkValidity()) return;
+  if (SUBJECT_TABLE.checkError()) return false;
+  if (!document.forms.settingsForm.checkValidity()) return false;
   // Sign Up
   for (let row = 1; row < SUBJECT_TABLE.countChildlen(); row++) {
     const DATA = new SUB_SUBJECT_DATA();
@@ -68,7 +71,8 @@ document.getElementById('signUp').addEventListener('click', () => {
         break;
     }
   }
-});
+  return true;
+};
 
 document.getElementById('close').addEventListener('click', (event) => {
   IPC_RENDERER.send('close_sub_subject');
