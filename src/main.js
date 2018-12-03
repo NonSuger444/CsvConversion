@@ -25,7 +25,7 @@ app.on('ready', () => {
   mainWindow.on('closed', () => app.quit());
 });
 
-ipcMain.on('set_subject', (event) => {
+ipcMain.on('open_subject', (event) => {
   mainWindow.loadURL(`file://${__dirname}/setSubject.html`);
 });
 
@@ -52,10 +52,18 @@ ipcMain.on('open_sub_subject', (event, subjectInfo) => {
   });
 });
 
+ipcMain.on('open_settings', (event) => {
+  mainWindow.loadURL(`file://${__dirname}/settings.html`);
+});
+
 ipcMain.on('close_subject', (event) => {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 });
 
 ipcMain.on('close_sub_subject', (event) => {
   setSubSubjectWindow.close();
+});
+
+ipcMain.on('close_settings', (event) => {
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
 });

@@ -103,5 +103,10 @@ function formatDateYMD(dt = new Date()) {
 
 // Push SetSubject Event
 document.getElementById('setSubject').addEventListener('click', () => {
-  IPC_RENDERER.send('set_subject');
+  IPC_RENDERER.send('open_subject');
+});
+
+// Push Settings Event
+document.getElementById('settings').addEventListener('click', () => {
+  IPC_RENDERER.send('open_settings');
 });
