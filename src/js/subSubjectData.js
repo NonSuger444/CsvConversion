@@ -189,10 +189,10 @@ module.exports = class SubSubjectData {
   }
 
   /**
-   * Database 補助科目情報 - 一括削除
+   * Database 補助科目情報 - 親ID検索
    * @return {Object} Database Info
    */
-  bulkDeleteData() {
+  searchParentData() {
     return {parentId: this._subjectId};
   }
 

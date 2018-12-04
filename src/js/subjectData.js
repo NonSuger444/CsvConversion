@@ -77,6 +77,22 @@ module.exports = class SubjectData {
   }
 
   /**
+   * Find 'CODE'
+   * @return {Object} query
+   */
+  findCodeData() {
+    return {code: this._code};
+  }
+
+  /**
+   * Find 'CODE' Include
+   * @return {Object} query
+   */
+  findCodeIncludeData() {
+    return {code: /this._code/};
+  }
+
+  /**
    * Database 科目情報 - EMPTY
    * @return {Object} Database Info - EMPTY
    */

@@ -6,6 +6,7 @@ const {app, BrowserWindow, ipcMain} = ELECTRON;
 
 let mainWindow;
 let setSubSubjectWindow;
+let searchSubjectWindow;
 
 app.on('ready', () => {
   // Create Window
@@ -56,6 +57,25 @@ ipcMain.on('open_settings', (event) => {
   mainWindow.loadURL(`file://${__dirname}/settings.html`);
 });
 
+ipcMain.on('open_search_subject', (event) => {
+  // Create Window
+  searchSubjectWindow = new BrowserWindow({
+    parent: mainWindow,
+    modal: true,
+    center: true,
+    show: false});
+  searchSubjectWindow.once('ready-to-show', () => {
+    searchSubjectWindow.show();
+  });
+  searchSubjectWindow.loadURL(`file://${__dirname}/searchSubject.html`);
+  // Show DevTools
+  searchSubjectWindow.webContents.openDevTools();
+  // Close
+  searchSubjectWindow.on('close', () => {
+    searchSubjectWindow = null;
+  });
+});
+
 ipcMain.on('close_subject', (event) => {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 });
@@ -66,4 +86,8 @@ ipcMain.on('close_sub_subject', (event) => {
 
 ipcMain.on('close_settings', (event) => {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+});
+
+ipcMain.on('close_search_subject', (event) => {
+  searchSubjectWindow.close();
 });

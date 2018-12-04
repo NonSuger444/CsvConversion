@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>科目検索</title>
+  <style type="text/css">
+    #selectSubject,
+    #selectSubSubject {
+      background-color: aqua;
+    }
+  </style>
+</head>
+<body>
+  <h1>科目検索</h1>
+  <h2>主科目</h2>
+  <input type="search" id="searchSubject">
+  <table>
+    <thead>
+      <th>ID</th>
+      <th>コード</th>
+      <th>名称</th>
+    </thead>
+    <tbody id="subjectListItem">
+    </tbody>
+  </table>
+  <h2>補助科目</h2>
+  <table>
+    <thead>
+      <th>ID</th>
+      <th>コード</th>
+      <th>名称</th>
+    </thead>
+    <tbody id="subSubjectListItem">
+    </tbody>
+  </table>
+  <p>
+    <button type="button" id="close">閉じる</button>
+  </p>
+  <script type="text/javascript" src="./searchSubject.js"></script>
+</body>
+</html>

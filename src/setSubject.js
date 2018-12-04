@@ -92,7 +92,7 @@ document.getElementById('settingsForm').onsubmit = () => {
               const SUB = new SUB_SUBJECT_DATA();
               SUB.subjectId = SUBJECT_TABLE.getID(row);
               return SUB_SUBJECT_DB.destroy(
-                  SUB.bulkDeleteData(),
+                  SUB.searchParentData(),
                   {multi: true});
             })
             .catch((error) => console.error(error));

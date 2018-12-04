@@ -69,7 +69,7 @@ module.exports = class SubjectTable {
   /**
    * Constructor
    * @param {Element} tbody Table Body Element
-   * @param {Object} dbColumn DB Colum Info
+   * @param {Object} dbColumn DB Column Info
    * @param {Boolean} main Subject Flag
    */
   constructor(
