@@ -6,7 +6,9 @@ const IPC_RENDERER = require('electron').ipcRenderer;
 // Database
 const DATABASE = require('./js/operationDb');
 const SUBJECT_DB = new DATABASE('./db/subject.db');
+const SUB_SUBJECT_DB = new DATABASE('./db/subSubject.db');
 const SUBJECT_DATA = require('./js/subjectData');
+const SUB_SUBJECT_DATA = require('./js/subSubjectData');
 
 // Table
 const TABLE = require('./js/subjectTable');
@@ -16,9 +18,19 @@ const SUBJECT_TABLE = new TABLE(
     true);
 
 // Initialize
-SUBJECT_DB.ensureIndex({fieldName: 'code', unique: true})
+SUBJECT_DB.ensureIndex({
+  fieldName: SUBJECT_DATA.columnCode(),
+  unique: true})
+    .then(() => {
+      return SUBJECT_DB.ensureIndex({
+        fieldName: SUBJECT_DATA.columnName(),
+        unique: true});
+    })
     .then(() => {
       return SUBJECT_DB.load();
+    })
+    .then(() => {
+      return SUB_SUBJECT_DB.load();
     })
     .then(() => {
       return SUBJECT_DB.sort({}, {code: 1});
@@ -52,12 +64,37 @@ document.getElementById('settingsForm').onsubmit = () => {
             .catch((error) => console.error(error));
         break;
       case TABLE.getChangeStateText():
-        SUBJECT_DB.update({_id: SUBJECT_TABLE.getID(row)},
+        SUBJECT_DB.update(
+            {_id: SUBJECT_TABLE.getID(row)},
             {$set: DATA.dbData()})
+            .then(() => {
+              return SUB_SUBJECT_DB.find({parentId: SUBJECT_TABLE.getID(row)});
+            })
+            .then((docs) => {
+              docs.forEach((subInfo, index) => {
+                const SUB = new SUB_SUBJECT_DATA();
+                SUB.subjectId = subInfo[SUB_SUBJECT_DATA.columnParentId()];
+                SUB.subjectCode = DATA.code;
+                SUB.subjectName = DATA.name;
+                SUB.subSubjectCode = subInfo[SUB_SUBJECT_DATA.columnCode()];
+                SUB.subSubjectName = subInfo[SUB_SUBJECT_DATA.columnName()];
+                SUB_SUBJECT_DB.update(
+                    {_id: subInfo[SUB_SUBJECT_DATA.columnId()]},
+                    {$set: SUB.dbData()})
+                    .catch((error) => console.error(error));
+              });
+            })
             .catch((error) => console.error(error));
         break;
       case TABLE.getDeleteStateText():
         SUBJECT_DB.destroy({_id: SUBJECT_TABLE.getID(row)})
+            .then(() => {
+              const SUB = new SUB_SUBJECT_DATA();
+              SUB.subjectId = SUBJECT_TABLE.getID(row);
+              return SUB_SUBJECT_DB.destroy(
+                  SUB.bulkDeleteData(),
+                  {multi: true});
+            })
             .catch((error) => console.error(error));
         break;
     }

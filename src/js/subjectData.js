@@ -61,6 +61,22 @@ module.exports = class SubjectData {
   }
 
   /**
+   * Subject DB - Column CODE
+   * @return {String} Column CODE
+   */
+  static columnCode() {
+    return COLUMN.code;
+  }
+
+  /**
+   * Subject DB - Column NAME
+   * @return {String} Column NAME
+   */
+  static columnName() {
+    return COLUMN.name;
+  }
+
+  /**
    * Database 科目情報 - EMPTY
    * @return {Object} Database Info - EMPTY
    */

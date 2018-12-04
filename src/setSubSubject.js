@@ -4,11 +4,15 @@
 const IPC_RENDERER = require('electron').ipcRenderer;
 
 // Subject Info
+let SUBJECT_ID;
 let SUBJECT_CODE;
+let SUBJECT_NAME;
 IPC_RENDERER.on('get_subject_info', (event, subjectInfo) => {
+  SUBJECT_ID = subjectInfo.id;
   SUBJECT_CODE = subjectInfo.code;
-  document.getElementById('subjectCode').value = subjectInfo.code;
-  document.getElementById('subjectName').value = subjectInfo.name;
+  SUBJECT_NAME = subjectInfo.name;
+  document.getElementById('subjectCode').value = SUBJECT_CODE;
+  document.getElementById('subjectName').value = SUBJECT_NAME;
 });
 
 // Database
@@ -24,7 +28,26 @@ const SUBJECT_TABLE = new TABLE(
     false);
 
 // Initialize
-SUB_SUBJECT_DB.ensureIndex({fieldName: 'uniqueCode', unique: true})
+SUB_SUBJECT_DB.ensureIndex(
+    {fieldName: SUB_SUBJECT_DATA.columnCode()})
+    .then(() => {
+      return SUB_SUBJECT_DB.ensureIndex(
+          {fieldName: SUB_SUBJECT_DATA.columnName()});
+    })
+    .then(() => {
+      return SUB_SUBJECT_DB.ensureIndex(
+          {fieldName: SUB_SUBJECT_DATA.columnParentId()});
+    })
+    .then(() => {
+      return SUB_SUBJECT_DB.ensureIndex({
+        fieldName: SUB_SUBJECT_DATA.columnUniqueCode(),
+        unique: true});
+    })
+    .then(() => {
+      return SUB_SUBJECT_DB.ensureIndex({
+        fieldName: SUB_SUBJECT_DATA.columnUniqueName(),
+        unique: true});
+    })
     .then(() => {
       return SUB_SUBJECT_DB.load();
     })
@@ -52,7 +75,9 @@ document.getElementById('settingsForm').onsubmit = () => {
   // Sign Up
   for (let row = 1; row < SUBJECT_TABLE.countChildlen(); row++) {
     const DATA = new SUB_SUBJECT_DATA();
+    DATA.subjectId = SUBJECT_ID;
     DATA.subjectCode = SUBJECT_CODE;
+    DATA.subjectName = SUBJECT_NAME;
     DATA.subSubjectCode = SUBJECT_TABLE.getCode(row);
     DATA.subSubjectName = SUBJECT_TABLE.getName(row);
     switch (SUBJECT_TABLE.getState(row)) {

@@ -9,7 +9,7 @@ const STATE = {
     button: '削除',
     color: 'mistyrose',
     readOnly: false,
-    disabled: false,
+    disabled: true,
     required: true,
   },
   change: {
@@ -17,7 +17,7 @@ const STATE = {
     button: '削除',
     color: 'lightskyblue',
     readOnly: false,
-    disabled: false,
+    disabled: true,
     required: true,
   },
   delete: {
@@ -33,7 +33,7 @@ const STATE = {
     button: '削除',
     color: 'lightyellow',
     readOnly: false,
-    disabled: false,
+    disabled: true,
     required: true,
   },
   nothing: {
@@ -55,12 +55,10 @@ const NAME = {
   set: 'set',
 };
 
-const DUPLICATION_CODE_ERROR = {
-  className: 'codeDouplicationError',
-  text: '※ 入力したコードは既に使用されています。',
-};
-
-const ERROR_MESSAGE = {
+const ERROR = {
+  className: 'error',
+  duplicationCodeError: '※ 入力したコードは既に使用されています。',
+  duplicationNameError: '※ 入力した名称は既に使用されています。',
   checkError: '状態が「異常」であるものがあります。\n「異常」を解決した後に実施してください。',
 };
 
@@ -115,7 +113,7 @@ module.exports = class SubjectTable {
     // Add Event
     code.addEventListener('DOMFocusOut', () => {
       // Check Duplication
-      if (this.duplicationError(row, state, code)) return;
+      if (this.duplicationError(row, state, code, NAME.code)) return;
       // Change State
       if (state.value === STATE.new.text) return;
       (code.value !== doc[NAME.code] || name.value !== doc[NAME.name]) ?
@@ -123,6 +121,8 @@ module.exports = class SubjectTable {
         this.setState(row, tState);
     });
     name.addEventListener('DOMFocusOut', () => {
+      // Check Duplication
+      if (this.duplicationError(row, state, name, NAME.name)) return;
       // Change State
       if (state.value === STATE.new.text) return;
       (code.value !== doc[NAME.code] || name.value !== doc[NAME.name]) ?
@@ -135,7 +135,7 @@ module.exports = class SubjectTable {
             if (SUBJECT_TABLE.checkError()) return;
             IPC_RENDERER.send(
                 'open_sub_subject',
-                {code: code.value, name: name.value});
+                {id: id.value, code: code.value, name: name.value});
           });
     }
     del.addEventListener('click', (event) => {
@@ -351,25 +351,34 @@ module.exports = class SubjectTable {
    * Duplication Error
    * @param {Object} row Row Info
    * @param {Object} state Subject State
-   * @param {Object} code Subject Code
+   * @param {Object} targetCell Target Cell
+   * @param {String} checkName Check Name
    * @return {Boolean} Result
    */
-  duplicationError(row, state, code) {
+  duplicationError(row, state, targetCell, checkName) {
     // Check Douplication Error
-    if (this.checkDuplication(code.value, NAME.code)) {
+    if (this.checkDuplication(targetCell.value, checkName)) {
       if (state.value !== STATE.error.text) {
         const p = document.createElement('p');
-        p.className = DUPLICATION_CODE_ERROR.className;
-        p.innerHTML = DUPLICATION_CODE_ERROR.text;
-        code.parentNode.insertBefore(p, code.nextSibling);
+        switch (checkName) {
+          case NAME.code:
+            p.className = ERROR.className;
+            p.innerHTML = ERROR.duplicationCodeError;
+            break;
+          case NAME.name:
+            p.className = ERROR.className;
+            p.innerHTML = ERROR.duplicationNameError;
+            break;
+        }
+        targetCell.parentNode.insertBefore(p, targetCell.nextSibling);
         this.setState(row, STATE.error);
       }
-      code.focus();
+      targetCell.focus();
       return true;
     } else {
       if (state.value === STATE.error.text) {
         const error = row
-            .getElementsByClassName(DUPLICATION_CODE_ERROR.className).item(0);
+            .getElementsByClassName(ERROR.className).item(0);
         error.parentNode.removeChild(error);
         switch (state.placeholder) {
           case STATE.nothing.text:
@@ -407,7 +416,7 @@ module.exports = class SubjectTable {
   checkError() {
     for (let row = 0; row < this.countChildlen(); row++) {
       if (this.getState(row) === STATE.error.text) {
-        alert(ERROR_MESSAGE.checkError);
+        alert(ERROR.checkError);
         return true;
       }
     }
