@@ -13,7 +13,13 @@
 <body>
   <h1>科目検索</h1>
   <h2>主科目</h2>
-  <input type="search" id="searchSubject">
+  <form id="searchMethod">
+    <input type="radio" id="code" name="search" value="code" checked>
+    <label for="code">コード</label>
+    <input type="radio" id="name" name="search" value="name">
+    <label for="name">名称</label>
+  </form>
+  <input type="search" id="search">
   <table>
     <thead>
       <th>ID</th>
@@ -24,6 +30,13 @@
     </tbody>
   </table>
   <h2>補助科目</h2>
+  <form id="searchSubMethod">
+    <input type="radio" id="subCode" name="subSearch" value="code" checked>
+    <label for="subCode">コード</label>
+    <input type="radio" id="subName" name="subSearch" value="name">
+    <label for="subName">名称</label>
+  </form>
+  <input type="search" id="searchSub">
   <table>
     <thead>
       <th>ID</th>
@@ -35,6 +48,7 @@
   </table>
   <p>
     <button type="button" id="close">閉じる</button>
+    <button type="button" id="choice">選択</button>
   </p>
   <script type="text/javascript" src="./searchSubject.js"></script>
 </body>

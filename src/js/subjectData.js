@@ -77,19 +77,39 @@ module.exports = class SubjectData {
   }
 
   /**
-   * Find 'CODE'
+   * Database 科目情報 - 検索:Code
    * @return {Object} query
    */
-  findCodeData() {
+  findCode() {
     return {code: this._code};
   }
 
   /**
-   * Find 'CODE' Include
-   * @return {Object} query
+   * Database 科目情報 - 正規表現:Code
+   * @return {Object} Find Info
    */
-  findCodeIncludeData() {
-    return {code: /this._code/};
+  findRegCode() {
+    return {
+      code: new RegExp('^' + this._code),
+    };
+  }
+
+  /**
+   * Database 科目情報 - 正規表現:Name
+   * @return {Object} Find Info
+   */
+  findRegName() {
+    return {
+      code: new RegExp(this._name),
+    };
+  }
+
+  /**
+   * Sort ASC Code
+   * @return {Object} Sort Info
+   */
+  sortAscCode() {
+    return {code: 1};
   }
 
   /**

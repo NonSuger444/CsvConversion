@@ -57,7 +57,7 @@ ipcMain.on('open_settings', (event) => {
   mainWindow.loadURL(`file://${__dirname}/settings.html`);
 });
 
-ipcMain.on('open_search_subject', (event) => {
+ipcMain.on('open_search_subject', (event, settingsKind) => {
   // Create Window
   searchSubjectWindow = new BrowserWindow({
     parent: mainWindow,
@@ -68,6 +68,10 @@ ipcMain.on('open_search_subject', (event) => {
     searchSubjectWindow.show();
   });
   searchSubjectWindow.loadURL(`file://${__dirname}/searchSubject.html`);
+  // Send Data
+  searchSubjectWindow.webContents.on('did-finish-load', () => {
+    searchSubjectWindow.send('get_settings_kind', settingsKind);
+  });
   // Show DevTools
   searchSubjectWindow.webContents.openDevTools();
   // Close
@@ -89,5 +93,10 @@ ipcMain.on('close_settings', (event) => {
 });
 
 ipcMain.on('close_search_subject', (event) => {
+  searchSubjectWindow.close();
+});
+
+ipcMain.on('send_settings_info', (event, settingsInfo) => {
+  mainWindow.send('get_settings_info', settingsInfo);
   searchSubjectWindow.close();
 });

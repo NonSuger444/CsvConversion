@@ -190,10 +190,40 @@ module.exports = class SubSubjectData {
 
   /**
    * Database 補助科目情報 - 親ID検索
-   * @return {Object} Database Info
+   * @return {Object} Find Info
    */
-  searchParentData() {
+  findParent() {
     return {parentId: this._subjectId};
+  }
+
+  /**
+   * Database 補助科目情報 - 検索:親ID/正規表現:Code
+   * @return {Object} Find Info
+   */
+  findParentRegCode() {
+    return {
+      parentId: this._subjectId,
+      code: new RegExp('^' + this._subSubjectCode),
+    };
+  }
+
+  /**
+   * Database 補助科目情報 - 検索:親ID/正規表現:名称
+   * @return {Object} Find Info
+   */
+  findParentRegName() {
+    return {
+      parentId: this._subjectId,
+      name: new RegExp(this._subSubjectName),
+    };
+  }
+
+  /**
+   * Sort ASC Code
+   * @return {Object} Sort Info
+   */
+  sortAscCode() {
+    return {code: 1};
   }
 
   /**

@@ -94,6 +94,14 @@ module.exports = class SearchSubjectTable {
   }
 
   /**
+   * Count Childlen
+   * @return {Number} Count
+   */
+  countChildlen() {
+    return this.tbody.childElementCount;
+  }
+
+  /**
    * Get Select SubjectID
    * @return {String} SubjetID
    */
@@ -115,8 +123,88 @@ module.exports = class SearchSubjectTable {
    * @return {String} Selected ID
    */
   getSelectId(id) {
-    return document.getElementById(id)
-        .getElementsByClassName(NAME.id).item(0).value;
+    const row = document.getElementById(id);
+    if (row) {
+      return row.getElementsByClassName(NAME.id).item(0).value;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get Select SubjectCode
+   * @return {String} SubjetCode
+   */
+  getSelectSubjectCode() {
+    return this.getSelectCode(SELECT_ID.subject);
+  }
+
+  /**
+   * Get Select SubSubjectCode
+   * @return {String} SubSubjetCode
+   */
+  getSelectSubSubjectCode() {
+    return this.getSelectCode(SELECT_ID.subSubject);
+  }
+
+  /**
+   * Get Selected Code
+   * @param {String} id Search ID
+   * @return {String} Selected Code
+   */
+  getSelectCode(id) {
+    const row = document.getElementById(id);
+    if (row) {
+      return row.getElementsByClassName(NAME.code).item(0).value;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get Select SubjectName
+   * @return {String} SubjetName
+   */
+  getSelectSubjectName() {
+    return this.getSelectName(SELECT_ID.subject);
+  }
+
+  /**
+   * Get Select SubSubjectName
+   * @return {String} SubSubjetName
+   */
+  getSelectSubSubjectName() {
+    return this.getSelectName(SELECT_ID.subSubject);
+  }
+
+  /**
+   * Get Selected Name
+   * @param {String} id Search ID
+   * @return {String} Selected Name
+   */
+  getSelectName(id) {
+    const row = document.getElementById(id);
+    if (row) {
+      return row.getElementsByClassName(NAME.name).item(0).value;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Get Select ID By Subject
+   * @return {String} Select ID
+   */
+  static getSelectIdBySubject() {
+    return SELECT_ID.subject;
+  }
+
+  /**
+   * Get Select ID By SubSubject
+   * @return {String} Select ID
+   */
+  static getSelectIdBySubSubject() {
+    return SELECT_ID.subSubject;
   }
 
   /**

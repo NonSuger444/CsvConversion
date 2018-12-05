@@ -3,17 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <title>設定</title>
+  <style type="text/css">
+    .tagRed {
+      background-color: red;
+    }
+    .tagBlue {
+      background-color: blue;
+    }
+    .tagYellow {
+      background-color: yellow;
+    }
+    .tagGreen {
+      background-color: green;
+    }
+    .tagPink {
+      background-color: pink;
+    }
+  </style>
 </head>
 <body>
   <h1>設定</h1>
-  <form id="settingsForm">
+  <form id="cashForm">
+    <h2>現金科目</h2>
     <p>
-      <h2>現金科目</h2>
       <label for="cashCode">コード</label>
       <input type="text" id="cashCode" readonly>
+      <input type="text" id="cashSubCode" readonly>
       <label for="cashName">名称</label>
       <input type="text" id="cashName" readonly>
+      <input type="text" id="cashSubName" readonly>
       <button type="button" id="cashSearch">検索</button>
+    </p>
+  </form>
+  <form id="nothingForm">
+    <h2>科目記載無し</h2>
+    <p>
+      <label for="nothingCode">コード</label>
+      <input type="text" id="nothingCode" readonly>
+      <input type="text" id="nothingSubCode" readonly>
+      <label for="nothingName">名称</label>
+      <input type="text" id="nothingName" readonly>
+      <input type="text" id="nothingSubName" readonly>
+      <button type="button" id="nothingSearch">検索</button>
+    </p>
+    <p>
+      <div id="setNothingTagArea"></div>
+      <!-- <label for="nothingTag">付箋</label>
+      <select id="nothingTag" name="nothingTag" style="background-color: aqua">
+        <option value="" style="background-color: white">無</option>
+        <option value="1" class="tagRed">縦:1</option>
+        <option value="2" class="tagBlue">縦:2</option>
+        <option value="3" class="tagGreen">縦:3</option>
+        <option value="4" class="tagYellow">縦:4</option>
+        <option value="5" class="tagPink">縦:5</option>
+        <option value="A" class="tagRed">横:1</option>
+        <option value="B" class="tagBlue">横:2</option>
+        <option value="C" class="tagGreen">横:3</option>
+        <option value="D" class="tagYellow">横:4</option>
+        <option value="E" class="tagPink">横:5</option>
+      </select> -->
     </p>
   </form>
   <p>
