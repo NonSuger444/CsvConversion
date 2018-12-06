@@ -3,6 +3,8 @@
 // Electron
 const IPC_RENDERER = require('electron').ipcRenderer;
 
+const PARTS = require('./createDomParts');
+
 const STATE = {
   new: {
     text: '新規',
@@ -220,24 +222,24 @@ module.exports = class SubjectTable {
     // Set 'ID' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('text', NAME.id, NAME.id, null, true));
+        PARTS.input('text', NAME.id, NAME.id, null, true));
     // Set 'State' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('text', NAME.state, NAME.state, null, true));
+        PARTS.input('text', NAME.state, NAME.state, null, true));
     // Set 'SubjectCode' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('number', NAME.code, NAME.code));
+        PARTS.input('number', NAME.code, NAME.code));
     // Set 'SubjectName' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('text', NAME.name, NAME.name));
+        PARTS.input('text', NAME.name, NAME.name));
     // Set 'SetSubSubjectButton' Area
     if (this.main) {
       row.insertCell(-1);
       row.lastElementChild.appendChild(
-          this.createButton(
+          PARTS.button(
               null,
               'button',
               NAME.set,
@@ -248,7 +250,7 @@ module.exports = class SubjectTable {
     // Set 'ChangeStateButton' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createButton(
+        PARTS.button(
             null,
             'button',
             NAME.delete,
@@ -421,57 +423,5 @@ module.exports = class SubjectTable {
       }
     }
     return false;
-  }
-
-  /**
-   * Create Input Element
-   * @param {String} type Input Type
-   * @param {String} name Input Name
-   * @param {String} className Input Class Name
-   * @param {String} value Input Value
-   * @param {Boolean} readonly Input Readonly Flag
-   * @return {Element} Input Element
-   */
-  createInput(
-      type = 'text',
-      name = null,
-      className = null,
-      value = null,
-      readonly = false) {
-    const input = document.createElement('input');
-    input.type = type;
-    if (name) input.name = name;
-    if (className) input.className = className;
-    if (value) input.value = value;
-    if (readonly) input.readOnly = readonly;
-    return input;
-  }
-
-
-  /**
-   * Create Button Element
-   * @param {String} id Button ID
-   * @param {String} type Button Type
-   * @param {String} name Button Name
-   * @param {String} className Button Class Name
-   * @param {String} value Button Value
-   * @param {String} text Button Text
-   * @return {Any} Button Element
-   */
-  createButton(
-      id = null,
-      type = 'button',
-      name = null,
-      className = null,
-      value = null,
-      text = null) {
-    const button = document.createElement('button');
-    if (id) button.id = id;
-    button.type = type;
-    if (name) button.name = name;
-    if (className) button.className = className;
-    if (value) button.value = value;
-    if (text) button.innerHTML = text;
-    return button;
   }
 };

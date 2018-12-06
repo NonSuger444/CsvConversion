@@ -23,7 +23,7 @@
 </head>
 <body>
   <h1>設定</h1>
-  <form id="cashForm">
+  <form id="cashbookInfo">
     <h2>現金科目</h2>
     <p>
       <label for="cashCode">コード</label>
@@ -34,8 +34,6 @@
       <input type="text" id="cashSubName" readonly>
       <button type="button" id="cashSearch">検索</button>
     </p>
-  </form>
-  <form id="nothingForm">
     <h2>科目記載無し</h2>
     <p>
       <label for="nothingCode">コード</label>
@@ -47,26 +45,26 @@
       <button type="button" id="nothingSearch">検索</button>
     </p>
     <p>
-      <div id="setNothingTagArea"></div>
-      <!-- <label for="nothingTag">付箋</label>
-      <select id="nothingTag" name="nothingTag" style="background-color: aqua">
-        <option value="" style="background-color: white">無</option>
-        <option value="1" class="tagRed">縦:1</option>
-        <option value="2" class="tagBlue">縦:2</option>
-        <option value="3" class="tagGreen">縦:3</option>
-        <option value="4" class="tagYellow">縦:4</option>
-        <option value="5" class="tagPink">縦:5</option>
-        <option value="A" class="tagRed">横:1</option>
-        <option value="B" class="tagBlue">横:2</option>
-        <option value="C" class="tagGreen">横:3</option>
-        <option value="D" class="tagYellow">横:4</option>
-        <option value="E" class="tagPink">横:5</option>
-      </select> -->
+      <select id="nothingTagInfo"></select>
+    </p>
+    <h2>出納帳情報</h2>
+    <p>
+      <label for="cashbookDate">日付</label>
+      <input type="text" id="cashbookDate">
+      <label for="cashbookSubject">科目</label>
+      <input type="text" id="cashbookSubject">
+      <label for="cashbookPayment">入金</label>
+      <input type="text" id="cashbookPayment">
+      <label for="cashbookPayment">出金</label>
+      <input type="text" id="cashbookWithdrawal">
+      <label for="cashbookSummary">摘要</label>
+      <input type="text" id="cashbookSummary">
+    </p>
+    <p>
+      <button type="submit" id="signUp">登録</button>
+      <button type="button" id="close">閉じる</button>
     </p>
   </form>
-  <p>
-    <button type="button" id="close">閉じる</button>
-  </p>
   <script type="text/javascript" src="./settings.js"></script>
 </body>
 </html>

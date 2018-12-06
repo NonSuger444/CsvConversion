@@ -26,6 +26,10 @@ app.on('ready', () => {
   mainWindow.on('closed', () => app.quit());
 });
 
+ipcMain.on('open_convert_cashbook', (event) => {
+  mainWindow.loadURL(`file://${__dirname}/convertCashbook.html`);
+});
+
 ipcMain.on('open_subject', (event) => {
   mainWindow.loadURL(`file://${__dirname}/setSubject.html`);
 });
@@ -78,6 +82,10 @@ ipcMain.on('open_search_subject', (event, settingsKind) => {
   searchSubjectWindow.on('close', () => {
     searchSubjectWindow = null;
   });
+});
+
+ipcMain.on('close_convert_cashbook', (event) => {
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
 });
 
 ipcMain.on('close_subject', (event) => {

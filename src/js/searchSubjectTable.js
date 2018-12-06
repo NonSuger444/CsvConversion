@@ -1,5 +1,7 @@
 'use strict';
 
+const PARTS = require('./createDomParts');
+
 const SELECT_ID = {
   subject: 'selectSubject',
   subSubject: 'selectSubSubject',
@@ -63,15 +65,15 @@ module.exports = class SearchSubjectTable {
     // Set 'ID' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('text', NAME.id, NAME.id, null, true));
+        PARTS.input('text', NAME.id, NAME.id, null, true));
     // Set 'Code' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('number', NAME.code, NAME.code, null, true));
+        PARTS.input('number', NAME.code, NAME.code, null, true));
     // Set 'Name' Area
     row.insertCell(-1);
     row.lastElementChild.appendChild(
-        this.createInput('text', NAME.name, NAME.name, null, true));
+        PARTS.input('text', NAME.name, NAME.name, null, true));
     // Result
     return row;
   }
@@ -205,29 +207,5 @@ module.exports = class SearchSubjectTable {
    */
   static getSelectIdBySubSubject() {
     return SELECT_ID.subSubject;
-  }
-
-  /**
-   * Create Input Element
-   * @param {String} type Input Type
-   * @param {String} name Input Name
-   * @param {String} className Input Class Name
-   * @param {String} value Input Value
-   * @param {Boolean} readonly Input Readonly Flag
-   * @return {Element} Input Element
-   */
-  createInput(
-      type = 'text',
-      name = null,
-      className = null,
-      value = null,
-      readonly = false) {
-    const input = document.createElement('input');
-    input.type = type;
-    if (name) input.name = name;
-    if (className) input.className = className;
-    if (value) input.value = value;
-    if (readonly) input.readOnly = readonly;
-    return input;
   }
 };
