@@ -85,6 +85,14 @@ module.exports = class SubjectData {
   }
 
   /**
+   * Database 科目情報 - 検索:Name
+   * @return {Object} query
+   */
+  findName() {
+    return {name: this._name};
+  }
+
+  /**
    * Database 科目情報 - 正規表現:Code
    * @return {Object} Find Info
    */
