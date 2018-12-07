@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/NonSuger444/CsvConversion#readme",
   "dependencies": {
-    "electron": "^3.0.9",
+    "electron": "^3.0.10",
     "iconv-lite": "^0.4.24",
     "nedb": "^1.8.0",
     "xlsx": "^0.14.1"
