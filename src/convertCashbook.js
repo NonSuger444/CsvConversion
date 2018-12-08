@@ -134,8 +134,7 @@ function getExcel() {
   const row = XLSX.utils.sheet_to_json(worksheet);
   const success = [];
   const error = [];
-  const task = [];
-  // Check Excel Data
+  // Check Excel Data (Cashbook Data)
   for (let i = 0; i < row.length; i++) {
     // Required
     if (
@@ -161,14 +160,8 @@ function getExcel() {
       continue;
     }
     // OK
-    task.push(searchSubjectCode(row[i]));
-    success.push(row[i]);
+    success.push(searchSubjectCode(row[i]));
   }
-  Promise.all(task)
-      .then((values) => {
-        console.log(values);
-        console.log('aaa');
-      });
   if (error.length) {
     let info = '';
     error.forEach((value, index) => {
@@ -208,64 +201,69 @@ function getExcel() {
     };
     DIALOG.showMessageBox(win, options);
   } else {
-    const writeData = CSV.outputTitle() + '\n';
-    console.log(writeData);
-    // success.forEach((value, index) => {
-    //   console.log(index + '回目');
-    //   if (value[CASHBOOK.subject]) {
-    //     console.log('科目有 : ' + value[CASHBOOK.subject]);
-    //     DATA.name = value[CASHBOOK.subject];
-    //     console.log(DATA.findName());
-    //     SUBJECT_DB.find(DATA.findName())
-    //         .then((docs) => {
-    //           if (docs.length) {
-    //             writeData += index + ' : ' + docs[0][SUBJECT_DATA.columnCode()] + '\n';
-    //             console.log('科目コード:' + docs[0][SUBJECT_DATA.columnCode()]);
-    //           } else {
-    //             writeData += index + ' : 対象科目無し' + '\n';
-    //             console.log('対象名称無し');
-    //           }
-    //         })
-    //         .catch((error) => console.error(error));
-    //   } else {
-    //     console.log('科目無');
-    //   }
-    //   // const csvData = new CSV();
-    //   // // No.
-    //   // csvData.slipNumber = index + 1;
-    //   // // Date
-    //   // csvData.slipDate
-    //   //   = formatDateYMD(new Date(0, 0, value[CASHBOOK.date] - 1));
-    //   // // Check 'Payment' or 'Withdrawal'
-    //   // if (value[CASHBOOK.payment]) {
-    //   //   // Payment - Subject
-    //   // } else {
-    //   //   // Withdrawal
-    //   // }
-    //   // console.log(index);
-    //   // console.log(csvData.outputData());
-    // });
-    // console.log(writeData);
-    // FS.writeFileSync('C:/Users/fujimoto04/Desktop/output.txt', '');
-    // const fd = FS.openSync('C:/Users/fujimoto04/Desktop/output.txt', 'w');
-    // const sample = 'ファイル内容が更新される？';
-    // const buf = ICONV.encode(sample, 'Shift_JIS');
-    // FS.write(fd, buf, 0, buf.length, function(err, written, buffer) {
-    //   if (err) console.error(err);
-    // });
+    Promise.all(success).then((cashbookInfo) => {
+      let writeData = CSV.outputTitle() + '\n';
+      cashbookInfo.forEach((row, index) => {
+        const csvData = new CSV();
+        // No.
+        csvData.slipNumber = index + 1;
+        // Tag
+        csvData.tag = row[CASHBOOK.tag];
+        // Date
+        csvData.slipDate
+            = formatDateYMD(new Date(0, 0, row[CASHBOOK.date] - 1));
+        // Check 'Payment' or 'Withdrawal'
+        if (row[CASHBOOK.payment]) {
+          // Payment
+          csvData.drNumber = CASH.code;
+          csvData.subDrNumber = CASH.subCode;
+          csvData.drMoney = row[CASHBOOK.payment];
+          csvData.crNumber = row[CASHBOOK.code];
+          csvData.subCrNumber = row[CASHBOOK.subCode];
+          csvData.crMoney = row[CASHBOOK.payment];
+        } else {
+          // Withdrawal
+          csvData.drNumber = row[CASHBOOK.code];
+          csvData.subDrNumber = row[CASHBOOK.subCode];
+          csvData.drMoney = row[CASHBOOK.withdrawal];
+          csvData.crNumber = CASH.code;
+          csvData.subCrNumber = CASH.subCode;
+          csvData.crMoney = row[CASHBOOK.withdrawal];
+        }
+        // Summary
+        csvData.summary = row[CASHBOOK.summary];
+        // Input Date
+        csvData.inputDate = formatDateYMD();
+        // Push Write Data
+        writeData += csvData.outputData() + '\n';
+      });
+      console.log(writeData);
+      FS.writeFileSync('C:/Users/fujimoto04/Desktop/output.txt', '');
+      const fd = FS.openSync('C:/Users/fujimoto04/Desktop/output.txt', 'w');
+      const buf = ICONV.encode(writeData, 'Shift_JIS');
+      FS.write(fd, buf, 0, buf.length, function(err, written, buffer) {
+        if (err) console.error(err);
+      });
+    });
   }
 }
 
 /**
  * Search Subject Code
+ * @param {Object} data Cashbook Infomation
+ * @return {Object} Add Subject Code
  */
-function searchSubjectCode(cashbook) {
-  DATA.name = cashbook[CASHBOOK.subject];
-  return SUBJECT_DB.find(DATA.findName())
-      .then((docs) => {
-        cashbook['code'] = docs[0][SUBJECT_DATA.columnCode()];
-        return cashbook;
-      });
+function searchSubjectCode(data) {
+  DATA.name = data[CASHBOOK.subject];
+  return SUBJECT_DB.find(DATA.findName()).then((docs) => {
+    if (docs.length) {
+      data[CASHBOOK.code] = docs[0][SUBJECT_DATA.columnCode()];
+    } else {
+      data[CASHBOOK.code] = NOTHING.code;
+      data[CASHBOOK.tag] = NOTHING.tag;
+    }
+    return data;
+  }).catch((error) => console.error(error));
 }
 
 /**

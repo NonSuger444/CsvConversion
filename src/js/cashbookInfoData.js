@@ -21,6 +21,9 @@ module.exports = class CashbookInfoData {
    * @param {String} payment Payment
    * @param {String} withdrawal Withdrawal
    * @param {String} summary Summary
+   * @param {String} code Code
+   * @param {String} subCode Sub Code
+   * @param {String} tag Tag
    */
   constructor(
       id = null,
@@ -28,13 +31,19 @@ module.exports = class CashbookInfoData {
       subject = null,
       payment = null,
       withdrawal = null,
-      summary = null) {
+      summary = null,
+      code = 'CODE',
+      subCode = 'SUB_CODE',
+      tag = 'TAG') {
     this.id = id;
     this.date = date;
     this.subject = subject;
     this.payment = payment;
     this.withdrawal = withdrawal;
     this.summary = summary;
+    this.code = code;
+    this.subCode = subCode;
+    this.tag = tag;
   }
 
   /**
@@ -137,6 +146,57 @@ module.exports = class CashbookInfoData {
    */
   get summary() {
     return this._summary;
+  }
+
+  /**
+   * Code
+   * @param {String} code
+   * Set 'Code'
+   */
+  set code(code) {
+    this._code = code;
+  }
+
+  /**
+   * Code
+   * Get 'Code'
+   */
+  get code() {
+    return this._code;
+  }
+
+  /**
+   * Sub Code
+   * @param {String} subCode
+   * Set 'Sub Code'
+   */
+  set subCode(subCode) {
+    this._subCode = subCode;
+  }
+
+  /**
+   * Sub Code
+   * Get 'Sub Code'
+   */
+  get subCode() {
+    return this._subCode;
+  }
+
+  /**
+   * Tag
+   * @param {String} tag
+   * Set 'Tag'
+   */
+  set tag(tag) {
+    this._tag = tag;
+  }
+
+  /**
+   * Tag
+   * Get 'Tag'
+   */
+  get tag() {
+    return this._tag;
   }
 
   /**

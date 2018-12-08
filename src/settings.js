@@ -20,16 +20,16 @@ const CASHBOOK = new CASHBOOK_DATA();
 // Tag Info
 const TAG = {
   tag0: {text: '無し', value: '0', className: 'tagNothing'},
-  tag1: {text: '縦:1', value: '1', className: 'tagRed'},
-  tag2: {text: '縦:2', value: '2', className: 'tagBlue'},
-  tag3: {text: '縦:3', value: '3', className: 'tagYellow'},
-  tag4: {text: '縦:4', value: '4', className: 'tagGreen'},
-  tag5: {text: '縦:5', value: '5', className: 'tagPink'},
-  tagA: {text: '横:1', value: 'A', className: 'tagRed'},
-  tagB: {text: '横:2', value: 'B', className: 'tagBlue'},
-  tagC: {text: '横:3', value: 'C', className: 'tagYellow'},
-  tagD: {text: '横:4', value: 'D', className: 'tagGreen'},
-  tagE: {text: '横:5', value: 'E', className: 'tagPink'},
+  tag1: {text: '縦:1', value: 'A', className: 'tagRed'},
+  tag2: {text: '縦:2', value: 'B', className: 'tagBlue'},
+  tag3: {text: '縦:3', value: 'C', className: 'tagGreen'},
+  tag4: {text: '縦:4', value: 'D', className: 'tagYellow'},
+  tag5: {text: '縦:5', value: 'E', className: 'tagPink'},
+  tagA: {text: '横:1', value: '1', className: 'tagRed'},
+  tagB: {text: '横:2', value: '2', className: 'tagBlue'},
+  tagC: {text: '横:3', value: '3', className: 'tagGreen'},
+  tagD: {text: '横:4', value: '4', className: 'tagYellow'},
+  tagE: {text: '横:5', value: '5', className: 'tagPink'},
 };
 
 // Settings Kind

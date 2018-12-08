@@ -98,49 +98,49 @@ module.exports = class JournalEntryCsvDataForEpson {
    * @param {*} inputDate 入力日付
    */
   constructor(
-      monthType = 0,
-      type = 0,
-      format = 4,
-      make = 0,
-      tag = 0,
+      monthType = null,
+      type = null,
+      format = null,
+      make = null,
+      tag = null,
       slipDate = null,
-      slipNumber = 1,
-      slipSummary = '""',
-      branchNumber = 1,
+      slipNumber = null,
+      slipSummary = null,
+      branchNumber = null,
       drDepartmentNumber = null,
-      drDepartmentName = '""',
+      drDepartmentName = null,
       drNumber = null,
-      drSubject = '""',
+      drSubject = null,
       subDrNumber = null,
-      subDrSubject = '""',
+      subDrSubject = null,
       drMoney = null,
       drConsumptionTaxCode = null,
       drConsumptionTaxType = null,
       drConsumptionTaxRate = null,
       drFundType = null,
-      drAnyItem1 = '""',
-      drAnyItem2 = '""',
+      drAnyItem1 = null,
+      drAnyItem2 = null,
       crDepartmentNumber = null,
-      crDepartmentName = '""',
+      crDepartmentName = null,
       crNumber = null,
-      crSubject = '""',
+      crSubject = null,
       subCrNumber = null,
-      subCrSubject = '""',
+      subCrSubject = null,
       crMoney = null,
       crConsumptionTaxCode = null,
       crConsumptionTaxType = null,
       crConsumptionTaxRate = null,
       crFundType = null,
-      crAnyItem1 = '""',
-      crAnyItem2 = '""',
-      summary = '""',
+      crAnyItem1 = null,
+      crAnyItem2 = null,
+      summary = null,
       deadline = null,
-      proofNumber = '""',
-      inputMachine = '""',
-      inputUser = '""',
-      inputApplication = '""',
-      inputCompany = '""',
-      inputDate = '""'
+      proofNumber = null,
+      inputMachine = null,
+      inputUser = null,
+      inputApplication = null,
+      inputCompany = null,
+      inputDate = null
   ) {
     this.monthType = monthType;
     this.type = type;
@@ -928,48 +928,48 @@ module.exports = class JournalEntryCsvDataForEpson {
    * @return {String} CSV Data
    */
   outputData() {
-    return (this._monthType ? this._monthType : '') + ',' +
-           (this._type ? this._type : '') + ',' +
-           (this._format ? this._format : '') + ',' +
-           (this._make ? this._make : '') + ',' +
-           (this._tag ? this._tag : '') + ',' +
+    return (this._monthType ? this._monthType : 0) + ',' +
+           (this._type ? this._type : 0) + ',' +
+           (this._format ? this._format : 4) + ',' +
+           (this._make ? this._make : 0) + ',' +
+           (this._tag ? this._tag : 0) + ',' +
            (this._slipDate ? this._slipDate : '') + ',' +
-           (this._slipNumber ? this._slipNumber : '') + ',' +
-           (this._slipSummary ? this._slipSummary : '') + ',' +
-           (this._branchNumber ? this._branchNumber : '') + ',' +
+           (this._slipNumber ? this._slipNumber : 1) + ',' +
+           (this._slipSummary ? '"' + this._slipSummary + '"' : '""') + ',' +
+           (this._branchNumber ? this._branchNumber : 1) + ',' +
            (this._drDepartmentNumber ? this._drDepartmentNumber : '') + ',' +
-           (this._drDepartmentName ? this._drDepartmentName : '') + ',' +
+           (this._drDepartmentName ? '"' + this._drDepartmentName + '"' : '""') + ',' +
            (this._drNumber ? this._drNumber : '') + ',' +
-           (this._drSubject ? this._drSubject : '') + ',' +
+           (this._drSubject ? '"' + this._drSubject + '"' : '""') + ',' +
            (this._subDrNumber ? this._subDrNumber : '') + ',' +
-           (this._subDrSubject ? this._subDrSubject : '') + ',' +
+           (this._subDrSubject ? '"' + this._subDrSubject + '"' : '""') + ',' +
            (this._drMoney ? this._drMoney : '') + ',' +
            (this._drConsumptionTaxCode ? this._drConsumptionTaxCode : '') + ',' +
            (this._drConsumptionTaxType ? this._drConsumptionTaxType : '') + ',' +
            (this._drConsumptionTaxRate ? this._drConsumptionTaxRate : '') + ',' +
            (this._drFundType ? this._drFundType : '') + ',' +
-           (this._drAnyItem1 ? this._drAnyItem1 : '') + ',' +
-           (this._drAnyItem2 ? this._drAnyItem2 : '') + ',' +
+           (this._drAnyItem1 ? '"' + this._drAnyItem1 + '"' : '""') + ',' +
+           (this._drAnyItem2 ? '"' + this._drAnyItem2 + '"' : '""') + ',' +
            (this._crDepartmentNumber ? this._crDepartmentNumber : '') + ',' +
-           (this._crDepartmentName ? this._crDepartmentName : '') + ',' +
+           (this._crDepartmentName ? '"' + this._crDepartmentName + '"' : '""') + ',' +
            (this._crNumber ? this._crNumber : '') + ',' +
-           (this._crSubject ? this._crSubject : '') + ',' +
+           (this._crSubject ? '"' + this._crSubject + '"' : '""') + ',' +
            (this._subCrNumber ? this._subCrNumber : '') + ',' +
-           (this._subCrSubject ? this._subCrSubject : '') + ',' +
+           (this._subCrSubject ? '"' + this._subCrSubject + '"' : '""') + ',' +
            (this._crMoney ? this._crMoney : '') + ',' +
            (this._crConsumptionTaxCode ? this._crConsumptionTaxCode : '') + ',' +
            (this._crConsumptionTaxType ? this._crConsumptionTaxType : '') + ',' +
            (this._crConsumptionTaxRate ? this._crConsumptionTaxRate : '') + ',' +
            (this._crFundType ? this._crFundType : '') + ',' +
-           (this._crAnyItem1 ? this._crAnyItem1 : '') + ',' +
-           (this._crAnyItem2 ? this._crAnyItem2 : '') + ',' +
-           (this._summary ? this._summary : '') + ',' +
+           (this._crAnyItem1 ? '"' + this._crAnyItem1 + '"' : '""') + ',' +
+           (this._crAnyItem2 ? '"' + this._crAnyItem2 + '"' : '""') + ',' +
+           (this._summary ? '"' + this._summary + '"' : '""') + ',' +
            (this._deadline ? this._deadline : '') + ',' +
-           (this._proofNumber ? this._proofNumber : '') + ',' +
-           (this._inputMachine ? this._inputMachine : '') + ',' +
-           (this._inputUser ? this._inputUser : '') + ',' +
-           (this._inputApplication ? this._inputApplication : '') + ',' +
-           (this._inputCompany ? this._inputCompany : '') + ',' +
+           (this._proofNumber ? '"' + this._proofNumber + '"' : '""') + ',' +
+           (this._inputMachine ? '"' + this._inputMachine + '"' : '""') + ',' +
+           (this._inputUser ? '"' + this._inputUser + '"' : '""') + ',' +
+           (this._inputApplication ? '"' + this._inputApplication + '"' : '""') + ',' +
+           (this._inputCompany ? '"' + this._inputCompany + '"' : '""') + ',' +
            (this._inputDate ? this._inputDate : '');
   }
 };
