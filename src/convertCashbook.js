@@ -1,4 +1,3 @@
-
 'use strict';
 
 // Electron
@@ -34,15 +33,21 @@ let BOOK;
 // CSV
 const CSV = require('./js/journalEntryCsvDataForEpson');
 
+// Date
+const DATE = require('./js/formatDate');
+
 // File
-const FS = require('fs');
-const ICONV = require('iconv-lite');
+let SAVE_PTHA;
+const FILE = require('./js/fileControl');
+const CONVERSION = require('./js/charConversion');
 
 // Initialize
 SUBJECT_DB.load()
     .catch((error) => console.error(error));
+
 SUB_SUBJECT_DB.load()
     .catch((error) => console.error(error));
+
 CASH_DB.load()
     .then(() => {
       return CASH_DB.find();
@@ -58,6 +63,7 @@ CASH_DB.load()
       }
     })
     .catch((error) => console.error(error));
+
 NOTHING_DB.load()
     .then(() => {
       return NOTHING_DB.find();
@@ -74,6 +80,7 @@ NOTHING_DB.load()
       }
     })
     .catch((error) => console.error(error));
+
 CASHBOOK_DB.load()
     .then(() => {
       return CASHBOOK_DB.find();
@@ -92,7 +99,6 @@ CASHBOOK_DB.load()
     })
     .catch((error) => console.error(error));
 
-// FileSelect Button Event
 document.getElementById('fileSelect').addEventListener('click', () => {
   // Open Dialog
   const win = REMOTE.getCurrentWindow();
@@ -100,7 +106,7 @@ document.getElementById('fileSelect').addEventListener('click', () => {
     title: 'Excel選択',
     defaultPath: '.',
     filters: [
-      {name: 'Excel ブック (*.xlsx)', extensions: ['xlsx']},
+      {name: 'Excelブック (*.xlsx)', extensions: ['xlsx']},
     ],
     properties: ['openFile'],
   };
@@ -125,10 +131,27 @@ document.getElementById('fileSelect').addEventListener('click', () => {
   });
 });
 
+document.getElementById('savePathSelect').addEventListener('click', () => {
+  const win = REMOTE.getCurrentWindow();
+  const options = {
+    title: '保存場所指定',
+    filters: [
+      {name: 'CSVファイル (*.csv)', extensions: ['csv']},
+      {name: '全ファイル (*.*)', extensions: ['*']},
+    ],
+  };
+  DIALOG.showSaveDialog(win, options, (savePath) => {
+    SAVE_PTHA = savePath;
+    document.getElementById('savePath').innerHTML = savePath;
+  });
+});
+
 /**
  * Get Excel !!
  */
 function getExcel() {
+  const startDate = DATE.strToDate(document.getElementById('start').value);
+  const endDate = DATE.strToDate(document.getElementById('end').value);
   const sheet = document.forms.inputForm.selectSheet.value;
   const worksheet = BOOK.Sheets[sheet];
   const row = XLSX.utils.sheet_to_json(worksheet);
@@ -136,7 +159,7 @@ function getExcel() {
   const error = [];
   // Check Excel Data (Cashbook Data)
   for (let i = 0; i < row.length; i++) {
-    // Required
+    // Check Empty Row
     if (
       !row[i][CASHBOOK.date] &&
       !row[i][CASHBOOK.subject] &&
@@ -144,18 +167,25 @@ function getExcel() {
       !row[i][CASHBOOK.withdrawal] &&
       !row[i][CASHBOOK.summary]) {
       continue;
-    } else if (
-      !row[i][CASHBOOK.date]) {
+    }
+    // Check Date Range
+    const writeDate = new Date(0, 0, row[i][CASHBOOK.date] - 1);
+    if (startDate) {
+      if (writeDate < startDate) continue;
+    }
+    if (endDate) {
+      if (writeDate > endDate) continue;
+    }
+    // Check Required
+    if (!row[i][CASHBOOK.date]) {
       error.push(row[i]);
       continue;
-    } else if (
-      !row[i][CASHBOOK.payment] &&
-      !row[i][CASHBOOK.withdrawal]) {
+    }
+    if (!row[i][CASHBOOK.payment] && !row[i][CASHBOOK.withdrawal]) {
       error.push(row[i]);
       continue;
-    } else if (
-      row[i][CASHBOOK.payment] &&
-      row[i][CASHBOOK.withdrawal]) {
+    }
+    if (row[i][CASHBOOK.payment] && row[i][CASHBOOK.withdrawal]) {
       error.push(row[i]);
       continue;
     }
@@ -170,7 +200,7 @@ function getExcel() {
       // Date
       info += '[' + CASHBOOK.date + '] ';
       info += (value[CASHBOOK.date] ?
-                 formatDate(new Date(0, 0, value[CASHBOOK.date] - 1)) : '');
+                 DATE.yPmPd(new Date(0, 0, value[CASHBOOK.date] - 1)) : '');
       info += ' ';
       // Subject
       info += '[' + CASHBOOK.subject + '] ';
@@ -211,7 +241,7 @@ function getExcel() {
         csvData.tag = row[CASHBOOK.tag];
         // Date
         csvData.slipDate
-            = formatDateYMD(new Date(0, 0, row[CASHBOOK.date] - 1));
+            = DATE.ymd(new Date(0, 0, row[CASHBOOK.date] - 1));
         // Check 'Payment' or 'Withdrawal'
         if (row[CASHBOOK.payment]) {
           // Payment
@@ -233,17 +263,13 @@ function getExcel() {
         // Summary
         csvData.summary = row[CASHBOOK.summary];
         // Input Date
-        csvData.inputDate = formatDateYMD();
+        csvData.inputDate = DATE.ymd();
         // Push Write Data
-        writeData += csvData.outputData() + '\n';
+        writeData += CONVERSION.toHalfWidth(csvData.outputData()) + '\n';
       });
-      console.log(writeData);
-      FS.writeFileSync('C:/Users/fujimoto04/Desktop/output.txt', '');
-      const fd = FS.openSync('C:/Users/fujimoto04/Desktop/output.txt', 'w');
-      const buf = ICONV.encode(writeData, 'Shift_JIS');
-      FS.write(fd, buf, 0, buf.length, function(err, written, buffer) {
-        if (err) console.error(err);
-      });
+      // Write
+      const csvFile = new FILE(SAVE_PTHA, writeData);
+      csvFile.write(FILE.shiftJIS());
     });
   }
 }
@@ -264,30 +290,6 @@ function searchSubjectCode(data) {
     }
     return data;
   }).catch((error) => console.error(error));
-}
-
-/**
- * Create Date format 'yyyymmdd'
- * @param {Date} dt date
- * @return {Number} yyyymmdd is number
- */
-function formatDateYMD(dt = new Date()) {
-  const y = dt.getFullYear();
-  const m = ('00' + (dt.getMonth() + 1)).slice(-2);
-  const d = ('00' + dt.getDate()).slice(-2);
-  return Number(y + m + d);
-}
-
-/**
- * Create Date format 'yyyy/mm/dd'
- * @param {Date} dt date
- * @return {String} yyyy/mm/dd
- */
-function formatDate(dt = new Date()) {
-  const y = dt.getFullYear();
-  const m = ('00' + (dt.getMonth() + 1)).slice(-2);
-  const d = ('00' + dt.getDate()).slice(-2);
-  return y + '/' + m + '/' + d;
 }
 
 document.getElementById('close').addEventListener('click', (event) => {
