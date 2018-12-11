@@ -111,27 +111,20 @@ document.getElementById('fileSelect').addEventListener('click', () => {
     properties: ['openFile'],
   };
   DIALOG.showOpenDialog(win, options, (filePath) => {
-    // Show File Path
-    document.getElementById('filePath').innerHTML = filePath;
-    // Create Select Sheet
+    // Set File Path
+    document.getElementById('filePath').value = filePath[0];
+    // Set Book Information
     BOOK = XLSX.readFile(filePath[0]);
-    document.getElementById('selectSheetArea')
-        .appendChild(PARTS.select('selectSheet'));
+    // Create Select Sheet Options
+    const select = document.getElementById('selectSheet');
     BOOK.SheetNames.forEach((sheetName) => {
-      document.getElementById('selectSheet')
-          .appendChild(PARTS.option(sheetName, null, sheetName));
+      select.appendChild(PARTS.option(sheetName, null, sheetName));
     });
-    // CSV Convert Button
-    document.getElementById('convertArea')
-        .appendChild(PARTS.button(
-            'convert', 'button', 'convert', null, null, 'convert'));
-    // CSV Convert Event
-    document.getElementById('convert')
-        .addEventListener('click', () => getExcel());
+    select.disabled = false;
   });
 });
 
-document.getElementById('savePathSelect').addEventListener('click', () => {
+document.getElementById('setSaveFilePath').addEventListener('click', () => {
   const win = REMOTE.getCurrentWindow();
   const options = {
     title: '保存場所指定',
@@ -140,19 +133,31 @@ document.getElementById('savePathSelect').addEventListener('click', () => {
       {name: '全ファイル (*.*)', extensions: ['*']},
     ],
   };
-  DIALOG.showSaveDialog(win, options, (savePath) => {
-    SAVE_PTHA = savePath;
-    document.getElementById('savePath').innerHTML = savePath;
+  DIALOG.showSaveDialog(win, options, (saveFilePath) => {
+    SAVE_PTHA = saveFilePath;
+    document.getElementById('saveFilePath').value = saveFilePath;
   });
 });
 
+document.getElementById('convert').addEventListener('click', () => {
+  const result = checkCashbookData();
+  result.error.length ?
+    showErrorMessage(result.error) :
+    outputCsvFile(result.success);
+});
+
+document.getElementById('close').addEventListener('click', (event) => {
+  IPC_RENDERER.send('close_convert_cashbook');
+});
+
 /**
- * Get Excel !!
+ * Check Cashbook Data (EXCEL)
+ * @return {Object} Success Information AND Error Information
  */
-function getExcel() {
+function checkCashbookData() {
   const startDate = DATE.strToDate(document.getElementById('start').value);
   const endDate = DATE.strToDate(document.getElementById('end').value);
-  const sheet = document.forms.inputForm.selectSheet.value;
+  const sheet = document.getElementById('selectSheet').value;
   const worksheet = BOOK.Sheets[sheet];
   const row = XLSX.utils.sheet_to_json(worksheet);
   const success = [];
@@ -192,86 +197,98 @@ function getExcel() {
     // OK
     success.push(searchSubjectCode(row[i]));
   }
-  if (error.length) {
-    let info = '';
-    error.forEach((value, index) => {
-      // Row
-      info += '[行数] ' + value['__rowNum__'] + ' ';
-      // Date
-      info += '[' + CASHBOOK.date + '] ';
-      info += (value[CASHBOOK.date] ?
+  return {success: success, error: error};
+}
+
+/**
+ * Show Error Message
+ * @param {Array} error
+ */
+function showErrorMessage(error) {
+  const win = REMOTE.getCurrentWindow();
+  let message = '';
+  error.forEach((value, index) => {
+    // Row
+    message += '[行数] ' + value['__rowNum__'] + ' ';
+    // Date
+    message += '[' + CASHBOOK.date + '] ';
+    message += (value[CASHBOOK.date] ?
                  DATE.yPmPd(new Date(0, 0, value[CASHBOOK.date] - 1)) : '');
-      info += ' ';
-      // Subject
-      info += '[' + CASHBOOK.subject + '] ';
-      info += (value[CASHBOOK.subject] ? value[CASHBOOK.subject] : '');
-      info += ' ';
-      // Payment
-      info += '[' + CASHBOOK.payment + '] ';
-      info += (value[CASHBOOK.payment] ? value[CASHBOOK.payment] : '');
-      info += ' ';
-      // Withdrawal
-      info += '[' + CASHBOOK.withdrawal + '] ';
-      info += (value[CASHBOOK.withdrawal] ? value[CASHBOOK.withdrawal] : '');
-      info += ' ';
-      // Summary
-      info += '[' + CASHBOOK.summary + '] ';
-      info += (value[CASHBOOK.summary] ? value[CASHBOOK.summary] : '');
-      info += ' ';
-      // End
-      info += '\n';
-    });
-    const win = REMOTE.getCurrentWindow();
-    const options = {
-      type: 'warning',
-      buttons: ['OK'],
-      title: '出納帳記載エラー',
-      message: '出納帳の記載に誤りがあります。',
-      detail: info,
-    };
-    DIALOG.showMessageBox(win, options);
-  } else {
-    Promise.all(success).then((cashbookInfo) => {
-      let writeData = CSV.outputTitle() + '\n';
-      cashbookInfo.forEach((row, index) => {
-        const csvData = new CSV();
-        // No.
-        csvData.slipNumber = index + 1;
-        // Tag
-        csvData.tag = row[CASHBOOK.tag];
-        // Date
-        csvData.slipDate
+    message += ' ';
+    // Subject
+    message += '[' + CASHBOOK.subject + '] ';
+    message += (value[CASHBOOK.subject] ? value[CASHBOOK.subject] : '');
+    message += ' ';
+    // Payment
+    message += '[' + CASHBOOK.payment + '] ';
+    message += (value[CASHBOOK.payment] ? value[CASHBOOK.payment] : '');
+    message += ' ';
+    // Withdrawal
+    message += '[' + CASHBOOK.withdrawal + '] ';
+    message += (value[CASHBOOK.withdrawal] ? value[CASHBOOK.withdrawal] : '');
+    message += ' ';
+    // Summary
+    message += '[' + CASHBOOK.summary + '] ';
+    message += (value[CASHBOOK.summary] ? value[CASHBOOK.summary] : '');
+    message += ' ';
+    // End
+    message += '\n';
+  });
+  const options = {
+    type: 'warning',
+    buttons: ['OK'],
+    title: '出納帳記載エラー',
+    message: '出納帳の記載に誤りがあります。',
+    detail: message,
+  };
+  DIALOG.showMessageBox(win, options);
+}
+
+/**
+ * Output CSV FILE
+ * @param {Object} success
+ */
+function outputCsvFile(success) {
+  Promise.all(success).then((cashbookInfo) => {
+    let writeData = CSV.outputTitle() + '\n';
+    cashbookInfo.forEach((row, index) => {
+      const csvData = new CSV();
+      // No.
+      csvData.slipNumber = index + 1;
+      // Tag
+      csvData.tag = row[CASHBOOK.tag];
+      // Date
+      csvData.slipDate
             = DATE.ymd(new Date(0, 0, row[CASHBOOK.date] - 1));
-        // Check 'Payment' or 'Withdrawal'
-        if (row[CASHBOOK.payment]) {
-          // Payment
-          csvData.drNumber = CASH.code;
-          csvData.subDrNumber = CASH.subCode;
-          csvData.drMoney = row[CASHBOOK.payment];
-          csvData.crNumber = row[CASHBOOK.code];
-          csvData.subCrNumber = row[CASHBOOK.subCode];
-          csvData.crMoney = row[CASHBOOK.payment];
-        } else {
-          // Withdrawal
-          csvData.drNumber = row[CASHBOOK.code];
-          csvData.subDrNumber = row[CASHBOOK.subCode];
-          csvData.drMoney = row[CASHBOOK.withdrawal];
-          csvData.crNumber = CASH.code;
-          csvData.subCrNumber = CASH.subCode;
-          csvData.crMoney = row[CASHBOOK.withdrawal];
-        }
-        // Summary
-        csvData.summary = row[CASHBOOK.summary];
-        // Input Date
-        csvData.inputDate = DATE.ymd();
-        // Push Write Data
-        writeData += CONVERSION.toHalfWidth(csvData.outputData()) + '\n';
-      });
-      // Write
-      const csvFile = new FILE(SAVE_PTHA, writeData);
-      csvFile.write(FILE.shiftJIS());
+      // Check 'Payment' or 'Withdrawal'
+      if (row[CASHBOOK.payment]) {
+        // Payment
+        csvData.drNumber = CASH.code;
+        csvData.subDrNumber = CASH.subCode;
+        csvData.drMoney = row[CASHBOOK.payment];
+        csvData.crNumber = row[CASHBOOK.code];
+        csvData.subCrNumber = row[CASHBOOK.subCode];
+        csvData.crMoney = row[CASHBOOK.payment];
+      } else {
+        // Withdrawal
+        csvData.drNumber = row[CASHBOOK.code];
+        csvData.subDrNumber = row[CASHBOOK.subCode];
+        csvData.drMoney = row[CASHBOOK.withdrawal];
+        csvData.crNumber = CASH.code;
+        csvData.subCrNumber = CASH.subCode;
+        csvData.crMoney = row[CASHBOOK.withdrawal];
+      }
+      // Summary
+      csvData.summary = row[CASHBOOK.summary];
+      // Input Date
+      csvData.inputDate = DATE.ymd();
+      // Push Write Data
+      writeData += CONVERSION.toHalfWidth(csvData.outputData()) + '\n';
     });
-  }
+    // Write
+    const csvFile = new FILE(SAVE_PTHA, writeData);
+    csvFile.write(FILE.shiftJIS());
+  });
 }
 
 /**
@@ -291,7 +308,3 @@ function searchSubjectCode(data) {
     return data;
   }).catch((error) => console.error(error));
 }
-
-document.getElementById('close').addEventListener('click', (event) => {
-  IPC_RENDERER.send('close_convert_cashbook');
-});

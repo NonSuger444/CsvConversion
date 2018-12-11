@@ -2,25 +2,37 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>出納帳 - CSV出力</title>
+  <title>出納帳-CSV出力</title>
 </head>
 <body>
-  <form id="inputForm">
+  <h1>出納帳</h1>
+  <fieldset>
+    <legend>CSV出力</legend>
+    <h2>CSVファイル - 保存先指定</h2>
     <p>
-      <span id="filePath"></span>
-      <button type="button" name="fileSelect" id="fileSelect">File Select</button>
+      <input type="text" id="saveFilePath" readonly>
+      <button type="button" name="setSaveFilePath" id="setSaveFilePath">参照</button>
+    </p>
+    <h2>出納帳 - EXCELファイル指定</h2>
+    <p>
+      <input type="text" id="filePath" readonly>
+      <button type="button" name="fileSelect" id="fileSelect">参照</button>
+    </p>
+    <h2>出納帳 - 対象シート指定</h2>
+    <p>
+      <select id="selectSheet" disabled></select>
     </p>
     <p>
-      <span id="savePath"></span>
-      <button type="button" name="savePathSelect" id="savePathSelect">Save File</button>
+      <button id="convert" type="button" name="convert">実行</button>
     </p>
+  </fieldset>
+  <fieldset>
+    <legend>オプション</legend>
+    <h2>出力期間指定</h2>
     <p>
-      <input type="date" name="date" id="start">
-      <input type="date" name="date" id="end">
+      <input type="date" name="date" id="start"> ～ <input type="date" name="date" id="end">
     </p>
-    <div id="selectSheetArea"></div>
-    <div id="convertArea"></div>
-  </form>
+  </fieldset>
   <p>
     <button type="button" name="close" id="close">閉じる</button>
   </p>
