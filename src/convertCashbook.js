@@ -41,63 +41,104 @@ let SAVE_PTHA;
 const FILE = require('./js/fileControl');
 const CONVERSION = require('./js/charConversion');
 
+// Error
+const READ_ERROR = {
+  cash: {
+    id: 'cash',
+    error: 'There is no "cash" setting.',
+    title: '「現金科目」の設定がありません。',
+    message: '「現金科目」の設定がありません。' + '\n' +
+             '設定画面から「現金科目」の設定を行ってください。',
+  },
+  nothing: {
+    id: 'nothing',
+    error: 'There is no "nothing" setting.',
+    title: '「科目記載無し」の設定がありません。',
+    message: '「科目記載無し」の設定がありません。' + '\n' +
+             '設定画面から「科目記載無し」の設定を行ってください。',
+  },
+  cashbook: {
+    id: 'cashbook',
+    error: 'There is no "cashbook" setting.',
+    title: '「出納帳」の設定がありません。',
+    message: '「出納帳」の設定がありません。' + '\n' +
+             '設定画面から「出納帳」の設定を行ってください。',
+  },
+};
+
 // Initialize
-SUBJECT_DB.load()
-    .catch((error) => console.error(error));
-
-SUB_SUBJECT_DB.load()
-    .catch((error) => console.error(error));
-
-CASH_DB.load()
-    .then(() => {
-      return CASH_DB.find();
-    })
-    .then((docs) => {
-      // Set Data
-      if (docs.length) {
-        CASH.id = docs[0][CASH_DATA.columnID()];
-        CASH.code = docs[0][CASH_DATA.columnCode()];
-        CASH.name = docs[0][CASH_DATA.columnName()];
-        CASH.subCode = docs[0][CASH_DATA.columnSubCode()];
-        CASH.subName = docs[0][CASH_DATA.columnSubName()];
-      }
-    })
-    .catch((error) => console.error(error));
-
-NOTHING_DB.load()
-    .then(() => {
-      return NOTHING_DB.find();
-    })
-    .then((docs) => {
-      // Set Data
-      if (docs.length) {
-        NOTHING.id = docs[0][NOTHING_DATA.columnID()];
-        NOTHING.code = docs[0][NOTHING_DATA.columnCode()];
-        NOTHING.name = docs[0][NOTHING_DATA.columnName()];
-        NOTHING.subCode = docs[0][NOTHING_DATA.columnSubCode()];
-        NOTHING.subName = docs[0][NOTHING_DATA.columnSubName()];
-        NOTHING.tag = docs[0][NOTHING_DATA.columnTag()];
-      }
-    })
-    .catch((error) => console.error(error));
-
-CASHBOOK_DB.load()
-    .then(() => {
-      return CASHBOOK_DB.find();
-    })
-    .then((docs) => {
-      // Set Data
-      if (docs.length) {
-        CASHBOOK = new CASHBOOK_DATA(
-            docs[0][CASHBOOK_DATA.columnID()],
-            docs[0][CASHBOOK_DATA.columnDate()],
-            docs[0][CASHBOOK_DATA.columnSubject()],
-            docs[0][CASHBOOK_DATA.columnPayment()],
-            docs[0][CASHBOOK_DATA.columnWithdrawal()],
-            docs[0][CASHBOOK_DATA.columnSummary()]);
-      }
-    })
-    .catch((error) => console.error(error));
+SUBJECT_DB.load().then(() => {
+  return SUB_SUBJECT_DB.load();
+}).then(() => {
+  return CASH_DB.load();
+}).then(() => {
+  return CASH_DB.find();
+}).then((docs) => {
+  console.log(docs);
+  // Check Data
+  if (!docs.length) throw new Error(READ_ERROR.cash.id);
+  console.log('bbb');
+  if (!docs[0][CASH_DATA.columnCode()]) throw new Error(READ_ERROR.cash.id);
+  console.log('ccc');
+  // Set Data
+  CASH.id = docs[0][CASH_DATA.columnID()];
+  CASH.code = docs[0][CASH_DATA.columnCode()];
+  CASH.name = docs[0][CASH_DATA.columnName()];
+  CASH.subCode = docs[0][CASH_DATA.columnSubCode()];
+  CASH.subName = docs[0][CASH_DATA.columnSubName()];
+  // Next
+  return true;
+}).then(() => {
+  return NOTHING_DB.load();
+}).then(() => {
+  return NOTHING_DB.find();
+}).then((docs) => {
+  // Check Data
+  if (!docs.length) throw new Error(READ_ERROR.nothing.id);
+  if (!docs[0][NOTHING_DATA.columnCode()]) throw new Error(READ_ERROR.nothing.id);
+  // Set Data
+  NOTHING.id = docs[0][NOTHING_DATA.columnID()];
+  NOTHING.code = docs[0][NOTHING_DATA.columnCode()];
+  NOTHING.name = docs[0][NOTHING_DATA.columnName()];
+  NOTHING.subCode = docs[0][NOTHING_DATA.columnSubCode()];
+  NOTHING.subName = docs[0][NOTHING_DATA.columnSubName()];
+  NOTHING.tag = docs[0][NOTHING_DATA.columnTag()];
+  // Next
+  return true;
+}).then(() => {
+  return CASHBOOK_DB.load();
+}).then(() => {
+  return CASHBOOK_DB.find();
+}).then((docs) => {
+  // Check Data
+  if (!docs.length) throw new Error(READ_ERROR.cashbook.id);
+  if (!docs[0][NOTHING_DATA.columnCode()]) throw new Error(READ_ERROR.cashbook.id);
+  // Set Data
+  CASHBOOK = new CASHBOOK_DATA(
+      docs[0][CASHBOOK_DATA.columnID()],
+      docs[0][CASHBOOK_DATA.columnDate()],
+      docs[0][CASHBOOK_DATA.columnSubject()],
+      docs[0][CASHBOOK_DATA.columnPayment()],
+      docs[0][CASHBOOK_DATA.columnWithdrawal()],
+      docs[0][CASHBOOK_DATA.columnSummary()]);
+}).catch((error) => {
+  console.log(error);
+  console.log('aaa');
+  switch (error) {
+    case READ_ERROR.cash.id:
+      DIALOG.showErrorBox(READ_ERROR.cash.title, READ_ERROR.cash.message);
+      console.error(READ_ERROR.cash.error);
+      break;
+    case READ_ERROR.nothing.id:
+      DIALOG.showErrorBox(READ_ERROR.nothing.title, READ_ERROR.nothing.message);
+      console.error(READ_ERROR.nothing.error);
+      break;
+    case READ_ERROR.cashbook.id:
+      DIALOG.showErrorBox(READ_ERROR.cashbook.title, READ_ERROR.cashbook.message);
+      console.error(READ_ERROR.cashbook.error);
+      break;
+  }
+});
 
 document.getElementById('fileSelect').addEventListener('click', () => {
   // Open Dialog
@@ -130,7 +171,7 @@ document.getElementById('setSaveFilePath').addEventListener('click', () => {
     title: '保存場所指定',
     filters: [
       {name: 'CSVファイル (*.csv)', extensions: ['csv']},
-      {name: '全ファイル (*.*)', extensions: ['*']},
+      {name: 'テキストファイル (*.txt)', extensions: ['txt']},
     ],
   };
   DIALOG.showSaveDialog(win, options, (saveFilePath) => {
@@ -140,6 +181,7 @@ document.getElementById('setSaveFilePath').addEventListener('click', () => {
 });
 
 document.getElementById('convert').addEventListener('click', () => {
+  if (checkSetInfo()) return;
   const result = checkCashbookData();
   result.error.length ?
     showErrorMessage(result.error) :
@@ -151,10 +193,46 @@ document.getElementById('close').addEventListener('click', (event) => {
 });
 
 /**
+ * Check Set Infomation
+ * @return {Boolean} Information Set Error
+ */
+const checkSetInfo = () => {
+  console.log('create message');
+  let message = '';
+  if (!document.getElementById('filePath').value) {
+    message += '* 「EXCELファイル」の指定が有りません。';
+    message += '\n';
+  }
+  if (!document.getElementById('selectSheet').value) {
+    message += '* 「対象シート」の指定が有りません。';
+    message += '\n';
+  }
+  if (!document.getElementById('saveFilePath').value) {
+    message += '* 「ファイル保存先」の指定が有りません。';
+    message += '\n';
+  }
+  console.log('message : ' + message);
+  if (!message) return false;
+
+  const win = REMOTE.getCurrentWindow();
+  const options = {
+    type: 'warning',
+    buttons: ['OK'],
+    title: 'ファイル指定エラー',
+    message: '以下の情報が指定されていない為、ファイル出力ができません。',
+    detail: message,
+  };
+  DIALOG.showMessageBox(win, options);
+
+  return true;
+};
+
+/**
  * Check Cashbook Data (EXCEL)
  * @return {Object} Success Information AND Error Information
  */
-function checkCashbookData() {
+const checkCashbookData = () => {
+  const term = document.getElementById('term').checked;
   const startDate = DATE.strToDate(document.getElementById('start').value);
   const endDate = DATE.strToDate(document.getElementById('end').value);
   const sheet = document.getElementById('selectSheet').value;
@@ -174,12 +252,14 @@ function checkCashbookData() {
       continue;
     }
     // Check Date Range
-    const writeDate = new Date(0, 0, row[i][CASHBOOK.date] - 1);
-    if (startDate) {
-      if (writeDate < startDate) continue;
-    }
-    if (endDate) {
-      if (writeDate > endDate) continue;
+    if (term) {
+      const writeDate = new Date(0, 0, row[i][CASHBOOK.date] - 1);
+      if (startDate) {
+        if (writeDate < startDate) continue;
+      }
+      if (endDate) {
+        if (writeDate > endDate) continue;
+      }
     }
     // Check Required
     if (!row[i][CASHBOOK.date]) {
@@ -198,13 +278,13 @@ function checkCashbookData() {
     success.push(searchSubjectCode(row[i]));
   }
   return {success: success, error: error};
-}
+};
 
 /**
  * Show Error Message
  * @param {Array} error
  */
-function showErrorMessage(error) {
+const showErrorMessage = (error) => {
   const win = REMOTE.getCurrentWindow();
   let message = '';
   error.forEach((value, index) => {
@@ -242,13 +322,13 @@ function showErrorMessage(error) {
     detail: message,
   };
   DIALOG.showMessageBox(win, options);
-}
+};
 
 /**
  * Output CSV FILE
  * @param {Object} success
  */
-function outputCsvFile(success) {
+const outputCsvFile = (success) => {
   Promise.all(success).then((cashbookInfo) => {
     let writeData = CSV.outputTitle() + '\n';
     cashbookInfo.forEach((row, index) => {
@@ -289,14 +369,14 @@ function outputCsvFile(success) {
     const csvFile = new FILE(SAVE_PTHA, writeData);
     csvFile.write(FILE.shiftJIS());
   });
-}
+};
 
 /**
  * Search Subject Code
  * @param {Object} data Cashbook Infomation
  * @return {Object} Add Subject Code
  */
-function searchSubjectCode(data) {
+const searchSubjectCode = (data) => {
   DATA.name = data[CASHBOOK.subject];
   return SUBJECT_DB.find(DATA.findName()).then((docs) => {
     if (docs.length) {
@@ -307,4 +387,4 @@ function searchSubjectCode(data) {
     }
     return data;
   }).catch((error) => console.error(error));
-}
+};

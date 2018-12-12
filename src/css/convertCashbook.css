@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+/* Option */
+.options {
+  margin: 2em 0;
+  padding: 0;
+  max-width: 400px
+}
+.options label {
+  display: block;
+  margin: 1.5px 0;
+  padding: 13px 12px;
+  /* color: #ffba47; */
+  font-weight: bold;
+  /* background: #fff2cc; */
+  cursor: pointer;
+  transition: all 0.5s;
+}
+.options label::before {
+  padding-right: 8px;
+}
+.options label:hover {
+  /* background: #ffe0a9; */
+}
+.options input.accordion {
+  display: none;
+}
+.options .accshow {
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: 0.8s;
+}
+.accordion:checked + label + .accshow {
+  height: auto;
+  padding: 5px;
+  /* background: #fff5eb; */
+  opacity: 1;
+}
+.options .accshow p {
+  margin: 15px 10px;
+}
