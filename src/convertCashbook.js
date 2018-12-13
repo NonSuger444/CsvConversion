@@ -3,6 +3,7 @@
 // Electron
 const IPC_RENDERER = require('electron').ipcRenderer;
 const REMOTE = require('electron').remote;
+const CURRENT = REMOTE.getCurrentWindow();
 const DIALOG = REMOTE.dialog;
 
 // Database
@@ -42,27 +43,44 @@ const FILE = require('./js/fileControl');
 const CONVERSION = require('./js/charConversion');
 
 // Error
-const READ_ERROR = {
-  cash: {
-    id: 'cash',
-    error: 'There is no "cash" setting.',
-    title: '「現金科目」の設定がありません。',
-    message: '「現金科目」の設定がありません。' + '\n' +
+const ERROR = {
+  cashDB: {
+    type: 'error',
+    buttons: ['OK'],
+    title: '「現金科目」設定読込エラー',
+    message: '「現金科目」の設定がありません。',
+    detail: '「現金科目」の設定がありません。' + '\n' +
              '設定画面から「現金科目」の設定を行ってください。',
   },
-  nothing: {
-    id: 'nothing',
-    error: 'There is no "nothing" setting.',
-    title: '「科目記載無し」の設定がありません。',
-    message: '「科目記載無し」の設定がありません。' + '\n' +
+  nothingDB: {
+    type: 'error',
+    buttons: ['OK'],
+    title: '「科目記載無し」設定読込エラー',
+    message: '「科目記載無し」の設定がありません。',
+    detail: '「科目記載無し」の設定がありません。' + '\n' +
              '設定画面から「科目記載無し」の設定を行ってください。',
   },
-  cashbook: {
-    id: 'cashbook',
-    error: 'There is no "cashbook" setting.',
-    title: '「出納帳」の設定がありません。',
-    message: '「出納帳」の設定がありません。' + '\n' +
+  cashbookDB: {
+    type: 'error',
+    buttons: ['OK'],
+    title: '「出納帳」設定読込エラー',
+    message: '「出納帳」の設定がありません。',
+    detail: '「出納帳」の設定がありません。' + '\n' +
              '設定画面から「出納帳」の設定を行ってください。',
+  },
+  selectFile: {
+    type: 'error',
+    buttons: ['OK'],
+    title: 'ファイル指定エラー',
+    message: '以下の情報が指定されていない為、ファイル出力ができません。',
+    detail: '',
+  },
+  cashbookData: {
+    type: 'error',
+    buttons: ['OK'],
+    title: '出納帳記載エラー',
+    message: '出納帳の記載に誤りがあります。',
+    detail: '',
   },
 };
 
@@ -74,12 +92,14 @@ SUBJECT_DB.load().then(() => {
 }).then(() => {
   return CASH_DB.find();
 }).then((docs) => {
-  console.log(docs);
   // Check Data
-  if (!docs.length) throw new Error(READ_ERROR.cash.id);
-  console.log('bbb');
-  if (!docs[0][CASH_DATA.columnCode()]) throw new Error(READ_ERROR.cash.id);
-  console.log('ccc');
+  if (!docs.length ||
+      !docs[0][CASH_DATA.columnCode()]) {
+    // Error
+    showMessageBox(ERROR.cashDB);
+    buttonDisabled();
+    return false;
+  }
   // Set Data
   CASH.id = docs[0][CASH_DATA.columnID()];
   CASH.code = docs[0][CASH_DATA.columnCode()];
@@ -94,8 +114,13 @@ SUBJECT_DB.load().then(() => {
   return NOTHING_DB.find();
 }).then((docs) => {
   // Check Data
-  if (!docs.length) throw new Error(READ_ERROR.nothing.id);
-  if (!docs[0][NOTHING_DATA.columnCode()]) throw new Error(READ_ERROR.nothing.id);
+  if (!docs.length ||
+      !docs[0][NOTHING_DATA.columnCode()]) {
+    // Error
+    showMessageBox(ERROR.nothingDB);
+    buttonDisabled();
+    return false;
+  }
   // Set Data
   NOTHING.id = docs[0][NOTHING_DATA.columnID()];
   NOTHING.code = docs[0][NOTHING_DATA.columnCode()];
@@ -111,8 +136,17 @@ SUBJECT_DB.load().then(() => {
   return CASHBOOK_DB.find();
 }).then((docs) => {
   // Check Data
-  if (!docs.length) throw new Error(READ_ERROR.cashbook.id);
-  if (!docs[0][NOTHING_DATA.columnCode()]) throw new Error(READ_ERROR.cashbook.id);
+  if (!docs.length ||
+      !docs[0][CASHBOOK_DATA.columnDate()] ||
+      !docs[0][CASHBOOK_DATA.columnSubject()] ||
+      !docs[0][CASHBOOK_DATA.columnPayment()] ||
+      !docs[0][CASHBOOK_DATA.columnWithdrawal()] ||
+      !docs[0][CASHBOOK_DATA.columnSummary()]) {
+    // Error
+    showMessageBox(ERROR.cashbookDB);
+    buttonDisabled();
+    return false;
+  }
   // Set Data
   CASHBOOK = new CASHBOOK_DATA(
       docs[0][CASHBOOK_DATA.columnID()],
@@ -121,28 +155,10 @@ SUBJECT_DB.load().then(() => {
       docs[0][CASHBOOK_DATA.columnPayment()],
       docs[0][CASHBOOK_DATA.columnWithdrawal()],
       docs[0][CASHBOOK_DATA.columnSummary()]);
-}).catch((error) => {
-  console.log(error);
-  console.log('aaa');
-  switch (error) {
-    case READ_ERROR.cash.id:
-      DIALOG.showErrorBox(READ_ERROR.cash.title, READ_ERROR.cash.message);
-      console.error(READ_ERROR.cash.error);
-      break;
-    case READ_ERROR.nothing.id:
-      DIALOG.showErrorBox(READ_ERROR.nothing.title, READ_ERROR.nothing.message);
-      console.error(READ_ERROR.nothing.error);
-      break;
-    case READ_ERROR.cashbook.id:
-      DIALOG.showErrorBox(READ_ERROR.cashbook.title, READ_ERROR.cashbook.message);
-      console.error(READ_ERROR.cashbook.error);
-      break;
-  }
-});
+}).catch((error) => console.error(error));
 
 document.getElementById('fileSelect').addEventListener('click', () => {
   // Open Dialog
-  const win = REMOTE.getCurrentWindow();
   const options = {
     title: 'Excel選択',
     defaultPath: '.',
@@ -151,7 +167,7 @@ document.getElementById('fileSelect').addEventListener('click', () => {
     ],
     properties: ['openFile'],
   };
-  DIALOG.showOpenDialog(win, options, (filePath) => {
+  DIALOG.showOpenDialog(CURRENT, options, (filePath) => {
     // Set File Path
     document.getElementById('filePath').value = filePath[0];
     // Set Book Information
@@ -166,7 +182,6 @@ document.getElementById('fileSelect').addEventListener('click', () => {
 });
 
 document.getElementById('setSaveFilePath').addEventListener('click', () => {
-  const win = REMOTE.getCurrentWindow();
   const options = {
     title: '保存場所指定',
     filters: [
@@ -174,7 +189,7 @@ document.getElementById('setSaveFilePath').addEventListener('click', () => {
       {name: 'テキストファイル (*.txt)', extensions: ['txt']},
     ],
   };
-  DIALOG.showSaveDialog(win, options, (saveFilePath) => {
+  DIALOG.showSaveDialog(CURRENT, options, (saveFilePath) => {
     SAVE_PTHA = saveFilePath;
     document.getElementById('saveFilePath').value = saveFilePath;
   });
@@ -184,7 +199,7 @@ document.getElementById('convert').addEventListener('click', () => {
   if (checkSetInfo()) return;
   const result = checkCashbookData();
   result.error.length ?
-    showErrorMessage(result.error) :
+    cashbookDataError(result.error) :
     outputCsvFile(result.success);
 });
 
@@ -197,33 +212,23 @@ document.getElementById('close').addEventListener('click', (event) => {
  * @return {Boolean} Information Set Error
  */
 const checkSetInfo = () => {
-  console.log('create message');
-  let message = '';
+  let detail = '';
   if (!document.getElementById('filePath').value) {
-    message += '* 「EXCELファイル」の指定が有りません。';
-    message += '\n';
+    detail += '* 「EXCELファイル」の指定が有りません。';
+    detail += '\n';
   }
   if (!document.getElementById('selectSheet').value) {
-    message += '* 「対象シート」の指定が有りません。';
-    message += '\n';
+    detail += '* 「対象シート」の指定が有りません。';
+    detail += '\n';
   }
   if (!document.getElementById('saveFilePath').value) {
-    message += '* 「ファイル保存先」の指定が有りません。';
-    message += '\n';
+    detail += '* 「ファイル保存先」の指定が有りません。';
+    detail += '\n';
   }
-  console.log('message : ' + message);
-  if (!message) return false;
+  if (!detail) return false;
 
-  const win = REMOTE.getCurrentWindow();
-  const options = {
-    type: 'warning',
-    buttons: ['OK'],
-    title: 'ファイル指定エラー',
-    message: '以下の情報が指定されていない為、ファイル出力ができません。',
-    detail: message,
-  };
-  DIALOG.showMessageBox(win, options);
-
+  ERROR.selectFile.detail = detail;
+  showMessageBox(ERROR.selectFile);
   return true;
 };
 
@@ -281,47 +286,40 @@ const checkCashbookData = () => {
 };
 
 /**
- * Show Error Message
+ * Cashbook Data Error
  * @param {Array} error
  */
-const showErrorMessage = (error) => {
-  const win = REMOTE.getCurrentWindow();
-  let message = '';
+const cashbookDataError = (error) => {
+  let detail = '';
   error.forEach((value, index) => {
     // Row
-    message += '[行数] ' + value['__rowNum__'] + ' ';
+    detail += '[行数] ' + value['__rowNum__'] + ' ';
     // Date
-    message += '[' + CASHBOOK.date + '] ';
-    message += (value[CASHBOOK.date] ?
+    detail += '[' + CASHBOOK.date + '] ';
+    detail += (value[CASHBOOK.date] ?
                  DATE.yPmPd(new Date(0, 0, value[CASHBOOK.date] - 1)) : '');
-    message += ' ';
+    detail += ' ';
     // Subject
-    message += '[' + CASHBOOK.subject + '] ';
-    message += (value[CASHBOOK.subject] ? value[CASHBOOK.subject] : '');
-    message += ' ';
+    detail += '[' + CASHBOOK.subject + '] ';
+    detail += (value[CASHBOOK.subject] ? value[CASHBOOK.subject] : '');
+    detail += ' ';
     // Payment
-    message += '[' + CASHBOOK.payment + '] ';
-    message += (value[CASHBOOK.payment] ? value[CASHBOOK.payment] : '');
-    message += ' ';
+    detail += '[' + CASHBOOK.payment + '] ';
+    detail += (value[CASHBOOK.payment] ? value[CASHBOOK.payment] : '');
+    detail += ' ';
     // Withdrawal
-    message += '[' + CASHBOOK.withdrawal + '] ';
-    message += (value[CASHBOOK.withdrawal] ? value[CASHBOOK.withdrawal] : '');
-    message += ' ';
+    detail += '[' + CASHBOOK.withdrawal + '] ';
+    detail += (value[CASHBOOK.withdrawal] ? value[CASHBOOK.withdrawal] : '');
+    detail += ' ';
     // Summary
-    message += '[' + CASHBOOK.summary + '] ';
-    message += (value[CASHBOOK.summary] ? value[CASHBOOK.summary] : '');
-    message += ' ';
+    detail += '[' + CASHBOOK.summary + '] ';
+    detail += (value[CASHBOOK.summary] ? value[CASHBOOK.summary] : '');
+    detail += ' ';
     // End
-    message += '\n';
+    detail += '\n';
   });
-  const options = {
-    type: 'warning',
-    buttons: ['OK'],
-    title: '出納帳記載エラー',
-    message: '出納帳の記載に誤りがあります。',
-    detail: message,
-  };
-  DIALOG.showMessageBox(win, options);
+  ERROR.cashbookData.detail = detail;
+  showMessageBox(ERROR.cashbookData);
 };
 
 /**
@@ -387,4 +385,30 @@ const searchSubjectCode = (data) => {
     }
     return data;
   }).catch((error) => console.error(error));
+};
+
+/**
+ * Button Disabled
+ */
+const buttonDisabled = () => {
+  document.getElementById('fileSelect').disabled = true;
+  document.getElementById('setSaveFilePath').disabled = true;
+  document.getElementById('start').disabled = true;
+  document.getElementById('end').disabled = true;
+  document.getElementById('convert').disabled = true;
+};
+
+/**
+ * Show Message Box
+ * @param {Object} option Show Options Info
+ */
+const showMessageBox = (option) => {
+  const options = {
+    type: option.type,
+    buttons: option.buttons,
+    title: option.title,
+    message: option.message,
+    detail: option.detail,
+  };
+  DIALOG.showMessageBox(CURRENT, options);
 };
