@@ -1,0 +1,103 @@
+@charset "UTF-8";
+
+/* Title */
+h1 {
+  text-align: center;
+}
+
+/* Main Subject Information */
+.subjectInformationArea {
+  text-align: center;
+}
+
+.subjectNameLabel {
+  margin-left: 50px;
+}
+
+/* Table */
+.subjectTable {
+  margin: 0 auto;
+}
+
+.subjectTable td {
+  height: 40px;
+}
+
+.rowHide,
+.cellHide {
+  display: none;
+}
+
+.state {
+  border: none;
+  text-align: center;
+  width: 50px;
+}
+
+.code {
+  width: 210px;
+}
+
+.name {
+  width: 210px;
+}
+
+.set,
+.delete {
+  width: 120px;
+}
+
+.stateNew {
+  background: lightpink;
+}
+
+.stateChange {
+  background: lightblue;
+}
+
+.stateDelete {
+  background: lightgray;
+}
+
+.stateError {
+  background: khaki;
+  color: red;
+}
+
+.errorWord {
+  font-size: 10px;
+  font-weight: bold;
+  color: red;
+}
+
+/* Add / Sign Up Button */
+.controlArea {
+  text-align: center;
+}
+
+.addButton,
+.signUpButton {
+  width: 200px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.addButton {
+  margin-right: 50px;
+}
+
+.signUpButton {
+  margin-left: 50px;
+}
+
+/* Close Button */
+.closeArea {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.closeButton {
+  width: 500px;
+  height: 30px;
+  font-size: 18px;
+}

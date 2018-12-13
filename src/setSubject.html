@@ -2,14 +2,16 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>科目設定</title>
+  <title>主科目設定</title>
+  <link rel="stylesheet" href="./css/setSubject.css">
 </head>
 <body>
+  <h1>主科目設定</h1>
   <form id="settingsForm">
-    <table border="1">
+    <table class="subjectTable">
       <thead id="subjectListTitle">
         <tr>
-          <th>ID</th>
+          <th class="cellHide">ID</th>
           <th>状態</th>
           <th>科目コード</th>
           <th>科目名</th>
@@ -18,7 +20,7 @@
         </tr>
       </thead>
       <tbody id="subjectListItem">
-        <tr>
+        <tr class="rowHide">
           <td><input type="text" name="id" class="id" readonly></td>
           <td><input type="text" name="state" class="state" readonly></td>
           <td><input type="number" name="code" class="code" readonly></td>
@@ -28,13 +30,13 @@
         </tr>
       </tbody>
     </table>
-    <p>
-      <button type="button" id="add">追加</button>
-      <button type="submit" id="signUp">登録</button>
+    <p class="controlArea">
+      <button type="button" class="addButton" id="add">追加</button>
+      <button type="submit" class="signUpButton" id="signUp">登録</button>
     </p>
   </form>
-  <p>
-    <button type="button" id="close">閉じる</button>
+  <p class="closeArea">
+    <button type="button" class="closeButton" id="close">閉じる</button>
   </p>
   <script type="text/javascript" src="setSubject.js"></script>
 </body>

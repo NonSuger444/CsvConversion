@@ -51,6 +51,7 @@ SUBJECT_DB.load()
       subSubjectSearchDisabled(true);
     })
     .catch((error) => console.error(error));
+
 SUB_SUBJECT_DB.load()
     .catch((error) => console.error(error));
 

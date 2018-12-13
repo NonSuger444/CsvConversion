@@ -11,8 +11,8 @@ IPC_RENDERER.on('get_subject_info', (event, subjectInfo) => {
   SUBJECT_ID = subjectInfo.id;
   SUBJECT_CODE = subjectInfo.code;
   SUBJECT_NAME = subjectInfo.name;
-  document.getElementById('subjectCode').value = SUBJECT_CODE;
-  document.getElementById('subjectName').value = SUBJECT_NAME;
+  document.getElementById('subjectCode').innerHTML = SUBJECT_CODE;
+  document.getElementById('subjectName').innerHTML = SUBJECT_NAME;
 });
 
 // Database

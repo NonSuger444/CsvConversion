@@ -3,13 +3,14 @@
 // Electron
 const IPC_RENDERER = require('electron').ipcRenderer;
 
+// DOM
 const PARTS = require('./createDomParts');
 
 const STATE = {
   new: {
     text: '新規',
     button: '削除',
-    color: 'mistyrose',
+    className: 'stateNew',
     readOnly: false,
     disabled: true,
     required: true,
@@ -17,7 +18,7 @@ const STATE = {
   change: {
     text: '変更',
     button: '削除',
-    color: 'lightskyblue',
+    className: 'stateChange',
     readOnly: false,
     disabled: true,
     required: true,
@@ -25,7 +26,7 @@ const STATE = {
   delete: {
     text: '削除',
     button: '取消',
-    color: 'lightgray',
+    className: 'stateDelete',
     readOnly: true,
     disabled: true,
     required: false,
@@ -33,7 +34,7 @@ const STATE = {
   error: {
     text: '異常',
     button: '削除',
-    color: 'lightyellow',
+    className: 'stateError',
     readOnly: false,
     disabled: true,
     required: true,
@@ -41,7 +42,7 @@ const STATE = {
   nothing: {
     text: '',
     button: '削除',
-    color: null,
+    className: 'stateNothing',
     readOnly: false,
     disabled: false,
     required: true,
@@ -58,11 +59,13 @@ const NAME = {
 };
 
 const ERROR = {
-  className: 'error',
+  className: 'errorWord',
   duplicationCodeError: '※ 入力したコードは既に使用されています。',
   duplicationNameError: '※ 入力した名称は既に使用されています。',
   checkError: '状態が「異常」であるものがあります。\n「異常」を解決した後に実施してください。',
 };
+
+const HIDE = 'cellHide';
 
 /**
  * Subject Table
@@ -165,7 +168,7 @@ module.exports = class SubjectTable {
         this.setState(row, STATE.new);
         break;
       case STATE.change.text:
-        this, setState(row, STATE.change);
+        this.setState(row, STATE.change);
         break;
       case STATE.delete.text:
         this.setState(row, STATE.delete);
@@ -180,37 +183,53 @@ module.exports = class SubjectTable {
    */
   setState(row, state) {
     // Background
-    row.style.backgroundColor = state.color;
-    // ID
-    row.getElementsByClassName(NAME.id)
-        .item(0).style.backgroundColor = state.color;
+    this.removeStateClass(row.classList);
+    row.classList.add(state.className);
     // State
-    row.getElementsByClassName(NAME.state)
-        .item(0).value = state.text;
-    row.getElementsByClassName(NAME.state)
-        .item(0).style.backgroundColor = state.color;
+    const stateCol = row.getElementsByClassName(NAME.state).item(0);
+    this.removeStateClass(stateCol.classList);
+    stateCol.value = state.text;
+    stateCol.classList.add(state.className);
     // Code
-    row.getElementsByClassName(NAME.code)
-        .item(0).readOnly = state.readOnly;
-    row.getElementsByClassName(NAME.code)
-        .item(0).required = state.required;
-    row.getElementsByClassName(NAME.code)
-        .item(0).style.backgroundColor = state.color;
+    const codeCol = row.getElementsByClassName(NAME.code).item(0);
+    this.removeStateClass(codeCol.classList);
+    codeCol.readOnly = state.readOnly;
+    codeCol.required = state.required;
+    codeCol.classList.add(state.className);
     // Name
-    row.getElementsByClassName(NAME.name)
-        .item(0).readOnly = state.readOnly;
-    row.getElementsByClassName(NAME.name)
-        .item(0).required = state.required;
-    row.getElementsByClassName(NAME.name)
-        .item(0).style.backgroundColor = state.color;
+    const nameCol = row.getElementsByClassName(NAME.name).item(0);
+    this.removeStateClass(nameCol.classList);
+    nameCol.readOnly = state.readOnly;
+    nameCol.required = state.required;
+    nameCol.classList.add(state.className);
     // Sub Subject Button
-    if (this.main) {
-      row.getElementsByClassName(NAME.set)
-          .item(0).disabled = state.disabled;
-    }
+    const setCol = row.getElementsByClassName(NAME.set).item(0);
+    if (this.main) setCol.disabled = state.disabled;
     // Delete / Chancel Button
-    row.getElementsByClassName(NAME.delete)
-        .item(0).innerHTML = state.button;
+    const deleteCol = row.getElementsByClassName(NAME.delete).item(0);
+    deleteCol.innerHTML = state.button;
+  }
+
+  /**
+   * Remove State Class
+   * @param {DOMTokenList} classList
+   */
+  removeStateClass(classList) {
+    if (classList.contains(STATE.new.className)) {
+      classList.remove(STATE.new.className);
+    }
+    if (classList.contains(STATE.change.className)) {
+      classList.remove(STATE.change.className);
+    }
+    if (classList.contains(STATE.delete.className)) {
+      classList.remove(STATE.delete.className);
+    }
+    if (classList.contains(STATE.error.className)) {
+      classList.remove(STATE.error.className);
+    }
+    if (classList.contains(STATE.nothing.className)) {
+      classList.remove(STATE.nothing.className);
+    }
   }
 
   /**
@@ -221,6 +240,7 @@ module.exports = class SubjectTable {
     const row = this.tbody.insertRow(-1);
     // Set 'ID' Area
     row.insertCell(-1);
+    row.lastElementChild.className = HIDE;
     row.lastElementChild.appendChild(
         PARTS.input('text', NAME.id, NAME.id, null, true));
     // Set 'State' Area
@@ -361,18 +381,18 @@ module.exports = class SubjectTable {
     // Check Douplication Error
     if (this.checkDuplication(targetCell.value, checkName)) {
       if (state.value !== STATE.error.text) {
-        const p = document.createElement('p');
+        const div = document.createElement('div');
         switch (checkName) {
           case NAME.code:
-            p.className = ERROR.className;
-            p.innerHTML = ERROR.duplicationCodeError;
+            div.className = ERROR.className;
+            div.innerHTML = ERROR.duplicationCodeError;
             break;
           case NAME.name:
-            p.className = ERROR.className;
-            p.innerHTML = ERROR.duplicationNameError;
+            div.className = ERROR.className;
+            div.innerHTML = ERROR.duplicationNameError;
             break;
         }
-        targetCell.parentNode.insertBefore(p, targetCell.nextSibling);
+        targetCell.parentNode.insertBefore(div, targetCell.nextSibling);
         this.setState(row, STATE.error);
       }
       targetCell.focus();
