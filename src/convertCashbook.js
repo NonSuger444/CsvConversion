@@ -155,6 +155,8 @@ SUBJECT_DB.load().then(() => {
       docs[0][CASHBOOK_DATA.columnPayment()],
       docs[0][CASHBOOK_DATA.columnWithdrawal()],
       docs[0][CASHBOOK_DATA.columnSummary()]);
+  // Next
+  return true;
 }).catch((error) => console.error(error));
 
 document.getElementById('fileSelect').addEventListener('click', () => {

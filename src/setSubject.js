@@ -20,29 +20,21 @@ const SUBJECT_TABLE = new TABLE(
 // Initialize
 SUBJECT_DB.ensureIndex({
   fieldName: SUBJECT_DATA.columnCode(),
-  unique: true})
-    .then(() => {
-      return SUBJECT_DB.ensureIndex({
-        fieldName: SUBJECT_DATA.columnName(),
-        unique: true});
-    })
-    .then(() => {
-      return SUBJECT_DB.load();
-    })
-    .then(() => {
-      return SUB_SUBJECT_DB.load();
-    })
-    .then(() => {
-      return SUBJECT_DB.sort({}, {code: 1});
-    })
-    .then((docs) => {
-      docs.forEach((doc) => {
-        SUBJECT_TABLE.setRow(doc);
-      });
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  unique: true,
+}).then(() => {
+  return SUBJECT_DB.ensureIndex({
+    fieldName: SUBJECT_DATA.columnName(),
+    unique: true,
+  });
+}).then(() => {
+  return SUBJECT_DB.load();
+}).then(() => {
+  return SUB_SUBJECT_DB.load();
+}).then(() => {
+  return SUBJECT_DB.sort({}, SUBJECT_DATA.sortAscCode());
+}).then((docs) => {
+  docs.forEach((doc) => SUBJECT_TABLE.setRow(doc));
+}).catch((error) => console.error(error));
 
 document.getElementById('add').addEventListener('click', () => {
   if (SUBJECT_TABLE.checkError()) return;
@@ -55,35 +47,32 @@ document.getElementById('settingsForm').onsubmit = () => {
   if (!document.forms.settingsForm.checkValidity()) return false;
   // Sign Up
   for (let row = 1; row < SUBJECT_TABLE.countChildlen(); row++) {
-    const DATA = new SUBJECT_DATA();
-    DATA.code = SUBJECT_TABLE.getCode(row);
-    DATA.name = SUBJECT_TABLE.getName(row);
+    const DATA = new SUBJECT_DATA(
+        SUBJECT_TABLE.getID(row),
+        SUBJECT_TABLE.getCode(row),
+        SUBJECT_TABLE.getName(row));
     switch (SUBJECT_TABLE.getState(row)) {
       case TABLE.getNewStateText():
         SUBJECT_DB.insert(DATA.dbData())
             .catch((error) => console.error(error));
         break;
       case TABLE.getChangeStateText():
-        SUBJECT_DB.update(
-            {_id: SUBJECT_TABLE.getID(row)},
-            {$set: DATA.dbData()})
-            .then(() => {
-              return SUB_SUBJECT_DB.find({parentId: SUBJECT_TABLE.getID(row)});
-            })
-            .then((docs) => {
-              docs.forEach((subInfo, index) => {
-                const SUB = new SUB_SUBJECT_DATA();
-                SUB.subjectId = subInfo[SUB_SUBJECT_DATA.columnParentId()];
-                SUB.subjectCode = DATA.code;
-                SUB.subjectName = DATA.name;
-                SUB.subSubjectCode = subInfo[SUB_SUBJECT_DATA.columnCode()];
-                SUB.subSubjectName = subInfo[SUB_SUBJECT_DATA.columnName()];
-                SUB_SUBJECT_DB.update(
-                    {_id: subInfo[SUB_SUBJECT_DATA.columnId()]},
-                    {$set: SUB.dbData()})
-                    .catch((error) => console.error(error));
-              });
-            })
+        SUBJECT_DB.update(DATA.findId(), DATA.updateAll()).then(() => {
+          return SUB_SUBJECT_DB.find({parentId: SUBJECT_TABLE.getID(row)});
+        }).then((docs) => {
+          docs.forEach((subInfo, index) => {
+            const SUB = new SUB_SUBJECT_DATA();
+            SUB.subjectId = subInfo[SUB_SUBJECT_DATA.columnParentId()];
+            SUB.subjectCode = DATA.code;
+            SUB.subjectName = DATA.name;
+            SUB.subSubjectCode = subInfo[SUB_SUBJECT_DATA.columnCode()];
+            SUB.subSubjectName = subInfo[SUB_SUBJECT_DATA.columnName()];
+            SUB_SUBJECT_DB.update(
+                {_id: subInfo[SUB_SUBJECT_DATA.columnId()]},
+                {$set: SUB.dbData()})
+                .catch((error) => console.error(error));
+          });
+        })
             .catch((error) => console.error(error));
         break;
       case TABLE.getDeleteStateText():

@@ -222,7 +222,7 @@ module.exports = class SubSubjectData {
    * Sort ASC Code
    * @return {Object} Sort Info
    */
-  sortAscCode() {
+  static sortAscCode() {
     return {code: 1};
   }
 

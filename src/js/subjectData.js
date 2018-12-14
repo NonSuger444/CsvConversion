@@ -12,10 +12,35 @@ const COLUMN = {
 module.exports = class SubjectData {
   /**
    * Constructor
+   * @param {String} id Subject ID
+   * @param {Number} code Subject Code
+   * @param {String} name Subject Name
    */
-  constructor() {
-    this.name = null;
-    this.code = null;
+  constructor(
+      id = null,
+      code = null,
+      name = null
+  ) {
+    this.id = id;
+    this.code = code;
+    this.name = name;
+  }
+
+  /**
+   * 科目ID
+   * @param {String} id
+   * Set 'SubjectID'
+   */
+  set id(id) {
+    this._id = id;
+  }
+
+  /**
+   * 科目ID
+   * Get 'SubjectID'
+   */
+  get id() {
+    return this._id;
   }
 
   /**
@@ -77,6 +102,14 @@ module.exports = class SubjectData {
   }
 
   /**
+   * Database 科目情報 - 検索:ID
+   * @return {Object} query
+   */
+  findId() {
+    return {_id: this._id};
+  }
+
+  /**
    * Database 科目情報 - 検索:Code
    * @return {Object} query
    */
@@ -116,8 +149,16 @@ module.exports = class SubjectData {
    * Sort ASC Code
    * @return {Object} Sort Info
    */
-  sortAscCode() {
+  static sortAscCode() {
     return {code: 1};
+  }
+
+  /**
+   * Update ALL
+   * @return {Object} Update Info
+   */
+  updateAll() {
+    return {$set: this.dbData()};
   }
 
   /**
@@ -128,7 +169,8 @@ module.exports = class SubjectData {
     return {
       _id: null,
       code: null,
-      name: null};
+      name: null,
+    };
   }
 
   /**
@@ -138,6 +180,7 @@ module.exports = class SubjectData {
   dbData() {
     return {
       code: this._code,
-      name: this._name};
+      name: this._name,
+    };
   }
 };

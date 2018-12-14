@@ -40,20 +40,15 @@ IPC_RENDERER.on('get_settings_kind', (event, settingsKind) => {
 });
 
 // Initialize
-SUBJECT_DB.load()
-    .then(() => {
-      return SUBJECT_DB.sort({}, DATA.sortAscCode());
-    })
-    .then((docs) => {
-      docs.forEach((doc) => {
-        SUBJECT_TABLE.setRow(doc);
-      });
-      subSubjectSearchDisabled(true);
-    })
-    .catch((error) => console.error(error));
-
-SUB_SUBJECT_DB.load()
-    .catch((error) => console.error(error));
+SUBJECT_DB.load().then(() => {
+  return SUBJECT_DB.sort({}, DATA.sortAscCode());
+}).then((docs) => {
+  docs.forEach((doc) => SUBJECT_TABLE.setRow(doc));
+  subSubjectSearchDisabled(true);
+  return true;
+}).then(() => {
+  return SUB_SUBJECT_DB.load();
+}).catch((error) => console.error(error));
 
 document.getElementById('searchMethod').addEventListener('change', () => {
   // Set Search Method
