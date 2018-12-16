@@ -17,18 +17,49 @@ const COLUMN = {
 module.exports = class SubSubjectData {
   /**
    * Constructor
+   * @param {String} id ID
+   * @param {String} subjectId SubjectID
+   * @param {Number} subjectCode Subject Code
+   * @param {String} subjectName Subject Name
+   * @param {Number} subSubjectCode Sub Subject Code
+   * @param {String} subSubjectName Sub Subject Name
    */
-  constructor() {
-    this.subjectId = null;
-    this.subjectCode = null;
-    this.subjectName = null;
-    this.subSubjectName = null;
-    this.subSubjectCode = null;
+  constructor(
+      id = null,
+      subjectId = null,
+      subjectCode = null,
+      subjectName = null,
+      subSubjectCode = null,
+      subSubjectName = null) {
+    this.id = id;
+    this.subjectId = subjectId;
+    this.subjectCode = subjectCode;
+    this.subjectName = subjectName;
+    this.subSubjectCode = subSubjectCode;
+    this.subSubjectName = subSubjectName;
+  }
+
+  /**
+   * ID
+   * @param {String} id
+   * Set 'ID'
+   */
+  set id(id) {
+    this._id = id;
+  }
+
+  /**
+   * ID
+   * @return {String}
+   * Get 'ID'
+   */
+  get id() {
+    return this._id;
   }
 
   /**
    * 主科目 ID
-   * @param {Number} subjectId
+   * @param {String} subjectId
    * Set 'SubjectID'
    */
   set subjectId(subjectId) {
@@ -37,7 +68,7 @@ module.exports = class SubSubjectData {
 
   /**
    * 主科目 ID
-   * @return {Number}
+   * @return {String}
    * Get 'SubjectID'
    */
   get subjectId() {
@@ -189,11 +220,27 @@ module.exports = class SubSubjectData {
   }
 
   /**
+   * Database 補助科目情報 - ID検索
+   * @return {Object} Find Info
+   */
+  findId() {
+    return {_id: this._id};
+  }
+
+  /**
    * Database 補助科目情報 - 親ID検索
    * @return {Object} Find Info
    */
   findParent() {
     return {parentId: this._subjectId};
+  }
+
+  /**
+   * Database 補助科目情報 - 親Code検索
+   * @return {Object} Find Info
+   */
+  findParentCode() {
+    return {subjectCode: this._subjectCode};
   }
 
   /**
@@ -224,6 +271,22 @@ module.exports = class SubSubjectData {
    */
   static sortAscCode() {
     return {code: 1};
+  }
+
+  /**
+   * Multi Flag
+   * @return {Object} Multi flag
+   */
+  static multiFlag() {
+    return {multi: true};
+  }
+
+  /**
+   * Update ALL
+   * @return {Object} Update Info
+   */
+  updateAll() {
+    return {$set: this.dbData()};
   }
 
   /**

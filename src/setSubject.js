@@ -57,34 +57,30 @@ document.getElementById('settingsForm').onsubmit = () => {
             .catch((error) => console.error(error));
         break;
       case TABLE.getChangeStateText():
+        const SUB = new SUB_SUBJECT_DATA(null, SUBJECT_TABLE.getID(row));
         SUBJECT_DB.update(DATA.findId(), DATA.updateAll()).then(() => {
-          return SUB_SUBJECT_DB.find({parentId: SUBJECT_TABLE.getID(row)});
+          return SUB_SUBJECT_DB.find(SUB.findParent());
         }).then((docs) => {
           docs.forEach((subInfo, index) => {
-            const SUB = new SUB_SUBJECT_DATA();
-            SUB.subjectId = subInfo[SUB_SUBJECT_DATA.columnParentId()];
+            // Set Data
+            SUB.id = subInfo[SUB_SUBJECT_DATA.columnId()];
             SUB.subjectCode = DATA.code;
             SUB.subjectName = DATA.name;
             SUB.subSubjectCode = subInfo[SUB_SUBJECT_DATA.columnCode()];
             SUB.subSubjectName = subInfo[SUB_SUBJECT_DATA.columnName()];
-            SUB_SUBJECT_DB.update(
-                {_id: subInfo[SUB_SUBJECT_DATA.columnId()]},
-                {$set: SUB.dbData()})
+            // Update
+            SUB_SUBJECT_DB.update(SUB.findId(), SUB.updateAll())
                 .catch((error) => console.error(error));
           });
-        })
-            .catch((error) => console.error(error));
+        }).catch((error) => console.error(error));
         break;
       case TABLE.getDeleteStateText():
-        SUBJECT_DB.destroy({_id: SUBJECT_TABLE.getID(row)})
-            .then(() => {
-              const SUB = new SUB_SUBJECT_DATA();
-              SUB.subjectId = SUBJECT_TABLE.getID(row);
-              return SUB_SUBJECT_DB.destroy(
-                  SUB.findParent(),
-                  {multi: true});
-            })
-            .catch((error) => console.error(error));
+        SUBJECT_DB.destroy(DATA.findId()).then(() => {
+          const SUB = new SUB_SUBJECT_DATA(null, SUBJECT_TABLE.getID(row));
+          return SUB_SUBJECT_DB.destroy(
+              SUB.findParent(),
+              SUB_SUBJECT_DATA.multiFlag());
+        }).catch((error) => console.error(error));
         break;
     }
   }
