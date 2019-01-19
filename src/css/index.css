@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+/* Title */
+h1 {
+  font-size: 2.5rem;
+  margin: 0.5em 0;
+  text-align: center;
+}
+
+/* Box Frame */
+.frame {
+  position: relative;
+  margin: 1em auto;
+  padding: 1.2em 0.5em 0.5em 0.5em;
+  width: 95%;
+  font-size: 1.8rem;
+  background-color: white;
+  border: 1px solid slateblue;
+  box-shadow: 0 0 5px 2px mediumslateblue inset;
+}
+
+.frame-title {
+  position: absolute;
+  padding: 0.5em;
+  left: 20px;
+  top: -1em;
+  font-size: 1.8rem;
+  font-weight: bold;
+  background: white;
+  color: darkviolet;
+}
+
+/* Button */
+.button {
+  font-size: 1.5rem;
+  margin: 0.8em auto;
+  padding: 0.4em;
+  width: 100%;
+  border-radius: 0.5em;
+}

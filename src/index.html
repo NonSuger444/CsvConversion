@@ -2,19 +2,21 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Main</title>
+  <title>メニュー</title>
+  <link rel="stylesheet" href="./css/html5reset-1.6.1.css">
+  <link rel="stylesheet" href="./css/index.css">
 </head>
 <body>
-  <h1>Input EXCEL!!</h1>
-  <p>
-    <button type="button" name="convertCashbook" id="convertCashbook">Convert Cashbook</button>
-  </p>
-  <p>
-    <button type="button" name="setSubject" id="setSubject">Set Subject</button>
-  </p>
-  <p>
-    <button type="button" name="settings" id="settings">Settings</button>
-  </p>
+  <h1>メインメニュー</h1>
+  <div class="frame">
+    <span class="frame-title">CSV出力</span>
+    <button type="button" class="button" id="convertCashbook">現金出納帳</button>
+  </div>
+  <div class="frame">
+    <span class="frame-title">設定</span>
+    <button type="button" class="button" id="setSubject">勘定科目</button>
+    <button type="button" class="button" id="settings">現金出納帳</button>
+  </div>
   <script type="text/javascript" src="./index.js"></script>
 </body>
 </html>
