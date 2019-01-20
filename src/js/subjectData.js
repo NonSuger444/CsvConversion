@@ -141,7 +141,7 @@ module.exports = class SubjectData {
    */
   findRegName() {
     return {
-      code: new RegExp(this._name),
+      name: new RegExp(this._name),
     };
   }
 

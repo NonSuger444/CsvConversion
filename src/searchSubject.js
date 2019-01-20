@@ -41,7 +41,7 @@ IPC_RENDERER.on('get_settings_kind', (event, settingsKind) => {
 
 // Initialize
 SUBJECT_DB.load().then(() => {
-  return SUBJECT_DB.sort({}, DATA.sortAscCode());
+  return SUBJECT_DB.sort({}, SUBJECT_DATA.sortAscCode());
 }).then((docs) => {
   docs.forEach((doc) => SUBJECT_TABLE.setRow(doc));
   subSubjectSearchDisabled(true);
@@ -73,7 +73,7 @@ document.getElementById('subjectListItem').addEventListener('click', () => {
   SUB_SUBJECT_TABLE.deleteAllRow();
   // Set SubSubject Table
   SUB_DATA.subjectId = SUBJECT_TABLE.getSelectSubjectId();
-  SUB_SUBJECT_DB.sort(SUB_DATA.findParent(), SUB_DATA.sortAscCode())
+  SUB_SUBJECT_DB.sort(SUB_DATA.findParent(), SUB_SUBJECT_DATA.sortAscCode())
       .then((docs) => {
         docs.forEach((doc) => {
           SUB_SUBJECT_TABLE.setRow(doc);
@@ -143,7 +143,7 @@ function createSubjectTable() {
       break;
   }
   // Search
-  SUBJECT_DB.sort(query, DATA.sortAscCode())
+  SUBJECT_DB.sort(query, SUBJECT_DATA.sortAscCode())
       .then((docs) => {
         docs.forEach((doc) => {
           SUBJECT_TABLE.setRow(doc);
@@ -177,7 +177,7 @@ function createSubSubjectTable() {
       break;
   }
   // Search
-  SUB_SUBJECT_DB.sort(query, SUB_DATA.sortAscCode())
+  SUB_SUBJECT_DB.sort(query, SUB_SUBJECT_DATA.sortAscCode())
       .then((docs) => {
         docs.forEach((doc) => {
           SUB_SUBJECT_TABLE.setRow(doc);
