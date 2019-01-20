@@ -14,7 +14,7 @@ h1 {
 }
 
 .subjectNameLabel {
-  margin-left: 2rem;
+  margin-left: 0.8em;
 }
 
 /* Table */
@@ -28,21 +28,15 @@ h1 {
 }
 
 .subjectTable td {
-  height: 5rem;
+  font-size: 2rem;
+  height: 2.5em;
   vertical-align: middle;
 }
 
 .subjectTable td input {
   font-size: 1.6rem;
-  height: 3rem;
-  border-radius: .3rem;
-}
-
-.set,
-.delete {
-  font-size: 1.6rem;
-  height: 3rem;
-  border-radius: .5rem;
+  height: 2em;
+  border-radius: .4em;
 }
 
 .rowHide,
@@ -53,17 +47,22 @@ h1 {
 .state {
   border: none;
   text-align: center;
-  width: 5rem;
+  font-size: 1.6rem;
+  width: 3.2em;
 }
 
 .code,
 .name {
-  width: 21rem;
+  font-size: 1.6rem;
+  width: 13.2em;
 }
 
 .set,
 .delete {
-  width: 12rem;
+  font-size: 1.6rem;
+  height: 2em;
+  border-radius: .4em;
+  width: 7.5em;
 }
 
 .stateNew {
@@ -89,36 +88,30 @@ h1 {
   color: red;
 }
 
-/* Add / Sign Up Button */
+/* Add Button / Sign Up Button */
 .controlArea {
   text-align: center;
 }
 
 .addButton,
 .signUpButton {
-  width: 20rem;
-  height: 4rem;
   font-size: 1.8rem;
-  border-radius: .5rem;
-}
-
-.addButton {
-  margin-right: 5rem;
-}
-
-.signUpButton {
-  margin-left: 5rem;
+  width: 11.2em;
+  height: 2.3em;
+  border-radius: .28em;
+  margin: 0 1.4em;
 }
 
 /* Close Button */
 .closeArea {
+  font-size: 2rem;
   text-align: center;
-  margin: 4rem 0;
+  margin: 2em 0;
 }
 
 .closeButton {
-  width: 50rem;
-  height: 3rem;
   font-size: 1.6rem;
-  border-radius: .5rem;
+  width: 28.2em;
+  height: 2em;
+  border-radius: .4em;
 }
