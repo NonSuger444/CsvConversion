@@ -18,18 +18,18 @@ const SUBJECT_TABLE = new TABLE(
     true);
 
 // Initialize
-SUBJECT_DB.ensureIndex({
-  fieldName: SUBJECT_DATA.columnCode(),
-  unique: true,
+SUBJECT_DB.load().then(() => {
+  return SUB_SUBJECT_DB.load();
+}).then(() => {
+  return SUBJECT_DB.ensureIndex({
+    fieldName: SUBJECT_DATA.columnCode(),
+    unique: true,
+  });
 }).then(() => {
   return SUBJECT_DB.ensureIndex({
     fieldName: SUBJECT_DATA.columnName(),
     unique: true,
   });
-}).then(() => {
-  return SUBJECT_DB.load();
-}).then(() => {
-  return SUB_SUBJECT_DB.load();
 }).then(() => {
   return SUBJECT_DB.sort({}, SUBJECT_DATA.sortAscCode());
 }).then((docs) => {

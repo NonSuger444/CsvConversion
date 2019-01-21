@@ -26,8 +26,10 @@ const SUBJECT_TABLE = new TABLE(
     false);
 
 // Initialize
-SUB_SUBJECT_DB.ensureIndex({
-  fieldName: SUB_SUBJECT_DATA.columnCode(),
+SUB_SUBJECT_DB.load().then(() => {
+  return SUB_SUBJECT_DB.ensureIndex({
+    fieldName: SUB_SUBJECT_DATA.columnCode(),
+  });
 }).then(() => {
   return SUB_SUBJECT_DB.ensureIndex({
     fieldName: SUB_SUBJECT_DATA.columnName(),
@@ -44,8 +46,6 @@ SUB_SUBJECT_DB.ensureIndex({
   return SUB_SUBJECT_DB.ensureIndex({
     fieldName: SUB_SUBJECT_DATA.columnUniqueName(),
     unique: true});
-}).then(() => {
-  return SUB_SUBJECT_DB.load();
 }).then(() => {
   return SUB_SUBJECT_DB.sort(
       DATA.findParentCode(),
